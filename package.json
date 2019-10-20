@@ -1,0 +1,67 @@
+{
+  "name": "fastest-validator-decorators",
+  "author": "Toby de Havilland",
+  "version": "1.0.3",
+  "description": "Fastest validator decorators",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobydeh/fastest-validator-decorators.git"
+  },
+  "scripts": {
+    "clean": "rm -rf dist/",
+    "build": "tsc",
+    "prebuild": "npm run clean",
+    "lint": "eslint --ignore-path .gitignore **/*.ts",
+    "test": "jest",
+    "pretest": "npm run lint",
+    "prepublish": "npm run test && npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "@types/jest": "^24.0.19",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
+    "eslint": "^6.5.1",
+    "jest": "^24.9.0",
+    "reflect-metadata": "^0.1.13",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "fastest-validator": "^0.6.18"
+  },
+  "jest": {
+    "coverageDirectory": "<rootDir>/coverage",
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "testMatch": [
+      "**/*.spec.(ts|js)"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "globals": {
+      "ts-jest": {
+        "compiler": "typescript",
+        "tsconfig": "tsconfig.json"
+      }
+    }
+  }
+}

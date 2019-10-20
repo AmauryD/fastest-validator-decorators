@@ -1,0 +1,23 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "quotes": [2, "double"],
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "camelcase": "error",
+    "no-var": "error",
+    "eqeqeq": "error",
+    "no-return-await": "error",
+    "space-before-function-paren": ["error", "always"],
+    "no-multiple-empty-lines": "error",
+    "keyword-spacing": ["error", { "before": true, "after": true }],
+    "@typescript-eslint/no-array-constructor": "off",
+    "@typescript-eslint/indent": ["error", 2],
+    "@typescript-eslint/semi": ["error"],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/explicit-function-return-type": ["error", { "allowTypedFunctionExpressions": true }],
+    "@typescript-eslint/ban-ts-ignore": "off"
+  }
+}

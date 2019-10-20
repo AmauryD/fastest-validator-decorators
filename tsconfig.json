@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "alwaysStrict": true,
+    "declaration": true,
+    "types": [
+      "jest"
+    ],
+    "sourceMap": false,
+    "target": "es6",
+    "plugins": [
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
