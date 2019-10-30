@@ -29,11 +29,11 @@
     "@typescript-eslint/parser": "^2.4.0",
     "eslint": "^6.5.1",
     "jest": "^24.9.0",
-    "reflect-metadata": "^0.1.13",
     "ts-jest": "^24.1.0",
     "typescript": "^3.6.4"
   },
   "dependencies": {
+    "reflect-metadata": "^0.1.13",
     "fastest-validator": "^0.6.18"
   },
   "jest": {

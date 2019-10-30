@@ -71,10 +71,9 @@ const result = await validateOrReject(entity); // returns true or throws fastest
 
 ## Setup
 
-Install the package and reflect-metadata
+Install the package
 ```
 npm install --save fastest-validator-decorators
-npm install --save-dev reflect-metadata
 ```
 
 Add the following to your tsconfig.json
