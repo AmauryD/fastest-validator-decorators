@@ -20,7 +20,15 @@
   "files": [
     "dist"
   ],
-  "keywords": [],
+  "keywords": [
+    "validation",
+    "validator",
+    "validators",
+    "validate",
+    "schema",
+    "typescript",
+    "decorators"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "devDependencies": {
