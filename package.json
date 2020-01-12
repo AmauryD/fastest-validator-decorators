@@ -32,17 +32,17 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "devDependencies": {
-    "@types/jest": "^24.0.19",
-    "@typescript-eslint/eslint-plugin": "^2.4.0",
-    "@typescript-eslint/parser": "^2.4.0",
-    "eslint": "^6.5.1",
+    "@types/jest": "^24.0.25",
+    "@typescript-eslint/eslint-plugin": "^2.15.0",
+    "@typescript-eslint/parser": "^2.15.0",
+    "eslint": "^6.8.0",
     "jest": "^24.9.0",
-    "ts-jest": "^24.1.0",
-    "typescript": "^3.6.4"
+    "ts-jest": "^24.3.0",
+    "typescript": "^3.7.4"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.13",
-    "fastest-validator": "^0.6.18"
+    "fastest-validator": "^1.0.0"
   },
   "jest": {
     "coverageDirectory": "<rootDir>/coverage",
