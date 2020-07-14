@@ -14,7 +14,8 @@ import {
   Enum,
   Array,
   Nested,
-  Any
+  Any,
+  Equal
 } from "../src/index";
 
 describe("Schema", () => {
@@ -361,5 +362,26 @@ describe("Any", () => {
       prop: any;
     }
     expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "any" }});
+  });
+});
+
+describe("Equal", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Equal()
+      prop: unknown;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "equal" } });
+  });
+
+  it("Should apply passed options", () => {
+    @Schema()
+    class Test {
+      @Equal({ type: "x", field: "otherField" })
+      prop: unknown;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "equal", field: "otherField" } });
   });
 });
