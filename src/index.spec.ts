@@ -33,6 +33,34 @@ describe("Schema", () => {
     }
     expect(getSchema(Test)).toEqual({ $$strict: true });
   });
+
+  it("Should validate strict", () => {
+    @Schema(true)
+    class Test {
+      @String()
+      prop: string;
+      prop2: string;
+    }
+    const t = new Test();
+    t.prop = "prop";
+    t.prop2 = "prop2";
+    const result = validate(t);
+    expect(result[0].type).toEqual("objectStrict");
+  });
+
+  it("Should validate not strict", () => {
+    @Schema()
+    class Test {
+      @String()
+      prop: string;
+      prop2: string;
+    }
+    const t = new Test();
+    t.prop = "prop";
+    t.prop2 = "prop2";
+    expect(validate(t)).toEqual(true);
+  });
+
 });
 
 describe("Field", () => {
@@ -297,7 +325,9 @@ describe("Nested", () => {
 describe("validate", () => {
 
   it("Should throw an error if missing compiled validation method", () => {
-    expect(() => validate({})).toThrow();
+    class Test {
+    }
+    expect(() => validate(new Test())).toThrow();
   });
 
   it("Should return true when valid", () => {

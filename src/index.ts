@@ -2,13 +2,14 @@ import "reflect-metadata";
 import FastestValidator, { ValidationError } from "fastest-validator";
 
 const SCHEMA_KEY = Symbol("propertyMetadata");
+const COMPILE_KEY = Symbol("compileKey");
 
 export const validate = (obj: any): true | ValidationError[] => {
-  if (!obj._validate) {
+  const validate = Reflect.getMetadata(COMPILE_KEY, obj.constructor);
+  if (!validate) {
     throw new Error("Obj is missing complied validation method");
   }
-  const { _validate, _schema, ...data } = obj;
-  return _validate(data);
+  return validate(obj);
 };
 
 export const validateOrReject = async (obj: any): Promise<true | ValidationError[]> => {
@@ -33,12 +34,11 @@ export function Schema (strict = false, messages = {}): any {
   return function _Schema<T extends {new (...args: any[]): {}}>(target: T): any  {
     updateSchema(target.prototype, "$$strict", strict);
     return class extends target {
-      _validate: (obj: object) => true | ValidationError[];
       constructor (...args: any[]) {
         super(...args);
         const s = Reflect.getMetadata(SCHEMA_KEY, this) || {};
         const v = new FastestValidator({ messages });
-        this._validate = v.compile(s);
+        Reflect.defineMetadata(COMPILE_KEY, v.compile(s), target);
         return this;
       }
     };
