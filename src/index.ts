@@ -63,6 +63,7 @@ export const Email = decoratorFactory({ type: "email" });
 export const Date = decoratorFactory({ type: "date" });
 export const Enum = decoratorFactory({ type: "enum" });
 export const Array = decoratorFactory({ type: "array" });
+export const Any = decoratorFactory({ type: "any" });
 
 export function Nested (options: any | any[] = {}): any {
   return (target: any, key: string): any => {

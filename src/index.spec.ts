@@ -13,7 +13,8 @@ import {
   Date,
   Enum,
   Array,
-  Nested
+  Nested,
+  Any
 } from "../src/index";
 
 describe("Schema", () => {
@@ -348,5 +349,17 @@ describe("validateOrReject", () => {
     } catch (e) {
       expect(e[0].field).toEqual("prop");
     }
+  });
+});
+
+describe("Any", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Any()
+      prop: any;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "any" }});
   });
 });
