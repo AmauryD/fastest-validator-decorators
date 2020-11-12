@@ -4,7 +4,7 @@ import FastestValidator, { ValidationError } from "fastest-validator";
 const SCHEMA_KEY = Symbol("propertyMetadata");
 const COMPILE_KEY = Symbol("compileKey");
 
-export const validate = (obj: any): true | ValidationError[] => {
+export const validate = (obj: unknown): true | ValidationError[] => {
   const validate = Reflect.getMetadata(COMPILE_KEY, obj.constructor);
   if (!validate) {
     throw new Error("Obj is missing complied validation method");
@@ -12,7 +12,7 @@ export const validate = (obj: any): true | ValidationError[] => {
   return validate(obj);
 };
 
-export const validateOrReject = async (obj: any): Promise<true | ValidationError[]> => {
+export const validateOrReject = async (obj: unknown): Promise<true | ValidationError[]> => {
   const result = validate(obj);
   if (result !== true) {
     throw result;
@@ -20,7 +20,7 @@ export const validateOrReject = async (obj: any): Promise<true | ValidationError
   return true;
 };
 
-export function getSchema (target: any): any {
+export function getSchema (target: { prototype: unknown }): any {
   return Reflect.getMetadata(SCHEMA_KEY, target.prototype);
 }
 
@@ -31,7 +31,7 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
 };
 
 export function Schema (strict = false, messages = {}): any {
-  return function _Schema<T extends {new (...args: any[]): {}}>(target: T): any  {
+  return function _Schema<T extends {new (...args: any[]): Record<string, unknown>}>(target: T): any  {
     updateSchema(target.prototype, "$$strict", strict);
     return class extends target {
       constructor (...args: any[]) {
