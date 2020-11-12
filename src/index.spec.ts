@@ -15,7 +15,8 @@ import {
   Array,
   Nested,
   Any,
-  Equal
+  Equal,
+  SchemaBase
 } from "../src/index";
 
 describe("Schema", () => {
@@ -36,28 +37,30 @@ describe("Schema", () => {
 
   it("Should validate strict", () => {
     @Schema(true)
-    class Test {
+    class Test extends SchemaBase {
       @String()
       prop: string;
       prop2: string;
     }
-    const t = new Test();
-    t.prop = "prop";
-    t.prop2 = "prop2";
+    const t = new Test({
+      prop: "prop",
+      prop2: "prop2",
+    });
     const result = validate(t);
     expect(result[0].type).toEqual("objectStrict");
   });
 
   it("Should validate not strict", () => {
     @Schema()
-    class Test {
+    class Test extends SchemaBase {
       @String()
       prop: string;
       prop2: string;
     }
-    const t = new Test();
-    t.prop = "prop";
-    t.prop2 = "prop2";
+    const t = new Test({
+      prop: "prop",
+      prop2: "prop2",
+    });
     expect(validate(t)).toEqual(true);
   });
 
@@ -311,7 +314,7 @@ describe("Nested", () => {
       prop: boolean;
     }
     @Schema()
-    class Test {
+    class Test { //eslint-disable-line
       @Nested()
       prop: NestedTest;
     }
@@ -328,27 +331,30 @@ describe("validate", () => {
     class Test {
     }
     expect(() => validate(new Test())).toThrow();
+    expect(() => validate({})).toThrow();
   });
 
   it("Should return true when valid", () => {
     @Schema()
-    class Test {
+    class Test extends SchemaBase {
       @Email()
       prop: string;
     }
-    const t = new Test();
-    t.prop = "test@test.com";
+    const t = new Test({
+      prop: "test@test.com",
+    });
     expect(validate(t)).toEqual(true);
   });
 
   it("Should return validation errors", () => {
     @Schema()
-    class Test {
+    class Test extends SchemaBase {
       @Email()
       prop: string;
     }
-    const t = new Test();
-    t.prop = "invalid";
+    const t = new Test({
+      prop: "invalid",
+    });
     expect(validate(t)[0].field).toEqual("prop");
   });
 });
@@ -357,23 +363,25 @@ describe("validateOrReject", () => {
 
   it("Should return true when valid", async () => {
     @Schema()
-    class Test {
+    class Test extends SchemaBase {
       @Email()
       prop: string;
     }
-    const t = new Test();
-    t.prop = "test@test.com";
+    const t = new Test({
+      prop: "test@test.com"
+    });
     expect(await validateOrReject(t)).toEqual(true);
   });
 
   it("Should throw validation errors", async () => {
     @Schema()
-    class Test {
+    class Test extends SchemaBase {
       @Email()
       prop: string;
     }
-    const t = new Test();
-    t.prop = "invalid";
+    const t = new Test({
+      prop: "invalid",
+    });
     expect.assertions(1);
     try {
       await validateOrReject(t);

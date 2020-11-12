@@ -69,6 +69,19 @@ const result = validate(entity); // returns true or fastest-validator errors
 const result = await validateOrReject(entity); // returns true or throws fastest-validator errors
 ```
 
+There is a SchemaBase utility class that reduces the verbosity of instantiating new objects by calling Object.assign in the constructor.
+
+```js
+@Schema()
+const Entity extends SchemaBase {
+  @Email()
+  email: string;
+}
+
+const entity = new Entity({ email: 'some@email.com' })
+const result = validate(entity);
+```
+
 ## Setup
 
 Install the package

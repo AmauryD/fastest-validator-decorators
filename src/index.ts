@@ -75,3 +75,9 @@ export function Nested (options: any | any[] = {}): any {
     updateSchema(target, key, { ...options, props, strict, type: "object" });
   };
 }
+
+export class SchemaBase {
+  public constructor (obj: Record<string, unknown>) {
+    Object.assign(this, obj);
+  }
+}
