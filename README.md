@@ -61,7 +61,7 @@ const schema = getSchema(Entity2); // get the fastest-validator schema
 const entity = new Entity2();
 entity.prop1 = "thiswillfail";
 entity.prop2 = "one";
-entity.prop3 = "some@email.com"
+entity.prop3 = "some@email.com";
 entity.prop4 = -10;
 entity.prop5 = new Entity1();
 
@@ -69,7 +69,7 @@ const result = validate(entity); // returns true or fastest-validator errors
 const result = await validateOrReject(entity); // returns true or throws fastest-validator errors
 ```
 
-There is a SchemaBase utility class that reduces the verbosity of instantiating new objects by calling Object.assign in the constructor.
+The SchemaBase utility class reduces the verbosity of instantiating new objects by calling Object.assign in the constructor and provides a validate() method.
 
 ```js
 @Schema()
@@ -78,8 +78,8 @@ const Entity extends SchemaBase {
   email: string;
 }
 
-const entity = new Entity({ email: 'some@email.com' })
-const result = validate(entity);
+const entity = new Entity({ email: 'some@email.com' });
+const result = entity.validate();
 ```
 
 ## Setup
