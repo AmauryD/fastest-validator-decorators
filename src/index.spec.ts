@@ -18,6 +18,7 @@ import {
   Equal,
   SchemaBase
 } from "../src/index";
+import * as v from "../src/index";
 
 describe("Schema", () => {
 
@@ -422,4 +423,22 @@ describe("Equal", () => {
     }
     expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "equal", field: "otherField" } });
   });
+});
+
+describe("SchemaBase", () => {
+
+  it("Should call validate", () => {
+    @Schema()
+    class Test extends SchemaBase {
+      @Email()
+      prop: string;
+    }
+    const t = new Test({
+      prop: "invalid",
+    });
+    jest.spyOn(v, "validate");
+    t.validate();
+    expect(v.validate).toBeCalledWith(t);
+  });
+
 });
