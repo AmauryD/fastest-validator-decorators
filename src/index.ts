@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import FastestValidator, { ValidationError } from "fastest-validator";
 
-const SCHEMA_KEY = Symbol("propertyMetadata");
-const COMPILE_KEY = Symbol("compileKey");
+export const SCHEMA_KEY = Symbol("propertyMetadata");
+export const COMPILE_KEY = Symbol("compileKey");
 
 export const validate = (obj: unknown): true | ValidationError[] => {
   const validate = Reflect.getMetadata(COMPILE_KEY, obj.constructor);
@@ -33,12 +33,12 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
 export function Schema (strict = false, messages = {}): any {
   return function _Schema<T extends {new (...args: any[]): Record<string, unknown>}>(target: T): any  {
     updateSchema(target.prototype, "$$strict", strict);
+    const s = Reflect.getMetadata(SCHEMA_KEY, target.prototype) || {};
+    const v = new FastestValidator({ messages });
+    Reflect.defineMetadata(COMPILE_KEY, v.compile(s), target);
     return class extends target {
       constructor (...args: any[]) {
         super(...args);
-        const s = Reflect.getMetadata(SCHEMA_KEY, this) || {};
-        const v = new FastestValidator({ messages });
-        Reflect.defineMetadata(COMPILE_KEY, v.compile(s), target);
         return this;
       }
     };
@@ -53,7 +53,7 @@ export const decoratorFactory = (mandatory = {}, defaults = {}) => {
   };
 };
 
-export const Field = decoratorFactory({}, {});
+export const Field = decoratorFactory({}, { type: "any" });
 export const String = decoratorFactory({ type: "string" }, { empty: false });
 export const Boolean = decoratorFactory({ type: "boolean" });
 export const Number = decoratorFactory({ type: "number" }, { convert: true });
@@ -61,7 +61,7 @@ export const UUID = decoratorFactory({ type: "uuid" });
 export const ObjectId = decoratorFactory({ type: "string" }, { pattern: /^[a-f\d]{24}$/i });
 export const Email = decoratorFactory({ type: "email" });
 export const Date = decoratorFactory({ type: "date" });
-export const Enum = decoratorFactory({ type: "enum" });
+export const Enum = decoratorFactory({ type: "enum" }, { values: [] });
 export const Array = decoratorFactory({ type: "array" });
 export const Any = decoratorFactory({ type: "any" });
 export const Equal = decoratorFactory({ type: "equal" });

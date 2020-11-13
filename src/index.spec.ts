@@ -16,7 +16,8 @@ import {
   Nested,
   Any,
   Equal,
-  SchemaBase
+  SchemaBase,
+  COMPILE_KEY
 } from "../src/index";
 import * as v from "../src/index";
 
@@ -65,17 +66,30 @@ describe("Schema", () => {
     expect(validate(t)).toEqual(true);
   });
 
+  it("Should compile the schema before instantiation", () => {
+    @Schema()
+    class Test extends SchemaBase {
+      @String()
+      prop: string;
+      prop2: string;
+    }
+    const compiled = Reflect.getMetadata(COMPILE_KEY, Test);
+    expect(compiled).toBeTruthy();
+    const t = new Test({});
+    expect(compiled).toBe(Reflect.getMetadata(COMPILE_KEY, t.constructor));
+  });
+
 });
 
 describe("Field", () => {
 
-  it("Should not apply any defaults", () => {
+  it("Should apply type any as a default", () => {
     @Schema()
     class Test {
       @Field()
       prop: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop: {} });
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "any" } });
   });
 
   it("Should apply passed options", () => {
@@ -243,7 +257,7 @@ describe("Enum", () => {
       @Enum()
       prop: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "enum" } });
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "enum", values: [] } });
   });
 
   it("Should apply passed options", () => {
@@ -252,7 +266,7 @@ describe("Enum", () => {
       @Enum({ type: "x", optional: true })
       prop: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "enum", optional: true } });
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "enum", optional: true, values: [] } });
   });
 });
 
