@@ -16,6 +16,12 @@ import {
   Nested,
   Any,
   Equal,
+  Instance,
+  Currency,
+  Func,
+  Luhn,
+  Mac,
+  Url,
   SchemaBase,
   COMPILE_KEY
 } from "../src/index";
@@ -194,7 +200,7 @@ describe("ObjectId", () => {
       @ObjectId()
       prop: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "string", pattern: expect.any(RegExp) } });
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "objectID" }});
   });
 
   it("Should apply passed options", () => {
@@ -203,7 +209,7 @@ describe("ObjectId", () => {
       @ObjectId({ type: "x", optional: true })
       prop: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "string", pattern: expect.any(RegExp), optional: true } });
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "objectID", optional: true } });
   });
 });
 
@@ -226,6 +232,100 @@ describe("Email", () => {
     }
     expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "email", optional: true } });
   });
+});
+
+describe("Instance", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Instance()
+      prop: unknown;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "class", instanceOf: Object } });
+  });
+
+  it("Should apply passed options", () => {
+    @Schema()
+    class Test {
+      @Instance({ type: "x", instanceOf: Buffer })
+      prop: Buffer;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "class", instanceOf: Buffer } });
+  });
+});
+
+describe("Currency", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Currency()
+      prop: string;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "currency", currencySymbol: "$" } });
+  });
+
+  it("Should apply passed options", () => {
+    @Schema()
+    class Test {
+      @Currency({ type: "x", currencySymbol: "£" })
+      prop: Buffer;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "currency", currencySymbol: "£" } });
+  });
+});
+
+describe("Func", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Func()
+      prop: () => void;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "function" } });
+  });
+
+});
+
+describe("Luhn", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Luhn()
+      prop: string;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "luhn" } });
+  });
+
+});
+
+describe("Mac", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Mac()
+      prop: string;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "mac" } });
+  });
+
+});
+
+describe("Url", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Url()
+      prop: string;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "url" } });
+  });
+
 });
 
 describe("Date", () => {

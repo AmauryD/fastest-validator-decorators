@@ -11,6 +11,7 @@
     "alwaysStrict": true,
     "declaration": true,
     "types": [
+      "node",
       "jest"
     ],
     "sourceMap": false,
