@@ -72,6 +72,20 @@ describe("Schema", () => {
     expect(validate(t)).toEqual(true);
   });
 
+  it("Should remove extra properties", () => {
+    @Schema("remove")
+    class Test extends SchemaBase {
+      @String()
+      prop!: string;
+    }
+    const t = new Test({
+      prop!: "prop",
+      prop2: "prop2",
+    });
+    expect(validate(t)).toEqual(true);
+    expect(Object.keys(t)).toEqual(["prop"]);
+  });
+
   it("Should compile the schema before instantiation", () => {
     @Schema()
     class Test extends SchemaBase {
