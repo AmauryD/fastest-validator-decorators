@@ -3,6 +3,7 @@ import FastestValidator, { ValidationError } from "fastest-validator";
 
 export const SCHEMA_KEY = Symbol("propertyMetadata");
 export const COMPILE_KEY = Symbol("compileKey");
+type StrictMode = boolean | "remove";
 
 export const validate = (obj: { constructor: any }): true | ValidationError[] => {
   const validate = Reflect.getMetadata(COMPILE_KEY, obj.constructor);
@@ -30,7 +31,7 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
   Reflect.defineMetadata(SCHEMA_KEY, s, target);
 };
 
-export function Schema (strict = false, messages = {}): any {
+export function Schema (strict: StrictMode = false, messages = {}): any {
   return function _Schema<T extends {new (...args: any[]): Record<string, unknown>}>(target: T): any  {
     updateSchema(target.prototype, "$$strict", strict);
     const s = Reflect.getMetadata(SCHEMA_KEY, target.prototype) || {};
