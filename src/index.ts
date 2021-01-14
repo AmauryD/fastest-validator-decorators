@@ -4,7 +4,7 @@ import FastestValidator, { ValidationError } from "fastest-validator";
 export const SCHEMA_KEY = Symbol("propertyMetadata");
 export const COMPILE_KEY = Symbol("compileKey");
 
-export const validate = (obj: unknown): true | ValidationError[] => {
+export const validate = (obj: { constructor: any }): true | ValidationError[] => {
   const validate = Reflect.getMetadata(COMPILE_KEY, obj.constructor);
   if (!validate) {
     throw new Error("Obj is missing complied validation method");
@@ -12,7 +12,7 @@ export const validate = (obj: unknown): true | ValidationError[] => {
   return validate(obj);
 };
 
-export const validateOrReject = async (obj: unknown): Promise<true | ValidationError[]> => {
+export const validateOrReject = async (obj: { constructor: any }): Promise<true | ValidationError[]> => {
   const result = validate(obj);
   if (result !== true) {
     throw result;
@@ -20,7 +20,7 @@ export const validateOrReject = async (obj: unknown): Promise<true | ValidationE
   return true;
 };
 
-export function getSchema (target: { prototype: unknown }): any {
+export function getSchema (target: { prototype: any }): any {
   return Reflect.getMetadata(SCHEMA_KEY, target.prototype);
 }
 
