@@ -35,7 +35,7 @@ export function Schema (strict: StrictMode = false, messages = {}): any {
   return function _Schema<T extends {new (...args: any[]): Record<string, unknown>}>(target: T): any  {
     updateSchema(target.prototype, "$$strict", strict);
     const s = Reflect.getMetadata(SCHEMA_KEY, target.prototype) || {};
-    const v = new FastestValidator({ messages });
+    const v = new FastestValidator({ messages, useNewCustomCheckerFunction: true });
     Reflect.defineMetadata(COMPILE_KEY, v.compile(s), target);
     return class extends target {
       constructor (...args: any[]) {
@@ -72,6 +72,7 @@ export const Func = decoratorFactory({ type: "function" });
 export const Luhn = decoratorFactory({ type: "luhn" });
 export const Mac = decoratorFactory({ type: "mac" });
 export const Url = decoratorFactory({ type: "url" });
+export const Custom = decoratorFactory({ type: "custom" }, { check (){/**/} });
 
 export function Nested (options: any | any[] = {}): any {
   return (target: any, key: string): any => {

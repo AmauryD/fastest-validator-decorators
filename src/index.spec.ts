@@ -22,6 +22,7 @@ import {
   Luhn,
   Mac,
   Url,
+  Custom,
   SchemaBase,
   COMPILE_KEY
 } from "../src/index";
@@ -579,6 +580,43 @@ describe("SchemaBase", () => {
     jest.spyOn(v, "validate");
     t.validate();
     expect(v.validate).toBeCalledWith(t);
+  });
+
+});
+
+describe("Custom", () => {
+
+  it("Should apply defaults", () => {
+    @Schema()
+    class Test {
+      @Custom()
+      prop!: unknown;
+    }
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: expect.objectContaining({ type: "custom" })});
+  });
+
+  it("Should validate", () => {
+    class X {}
+    @Schema(false, {
+      mustBeX: "The value must be an instance of X"
+    })
+    class Test {
+      @Custom({
+        check (value: any, errors: {type: string}[]){
+          if (!(value instanceof X)) {
+            errors.push({ type: "mustBeX"  });
+          }
+          return value;
+        }
+      })
+      prop!: X;
+    }
+    const t = new Test();
+    t.prop = {};
+    expect(validate(t)[0].field).toEqual("prop");
+    expect(validate(t)[0].message).toEqual("The value must be an instance of X");
+    t.prop = new X();
+    expect(validate(t)).toEqual(true);
   });
 
 });
