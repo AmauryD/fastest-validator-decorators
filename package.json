@@ -1,7 +1,7 @@
 {
   "name": "fastest-validator-decorators",
   "author": "Toby de Havilland",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Fastest validator decorators",
   "license": "MIT",
   "repository": {
