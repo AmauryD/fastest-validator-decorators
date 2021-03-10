@@ -100,6 +100,17 @@ describe("Schema", () => {
     expect(compiled).toBe(Reflect.getMetadata(COMPILE_KEY, t.constructor));
   });
 
+  it("should preserve the constructor name on instancies", () => {
+    @Schema()
+    class Test extends SchemaBase {
+      @String()
+      prop!: string;
+      prop2!: string;
+    }
+    const t = new Test({});
+    expect(t.constructor.name).toEqual("Test");
+  });
+
 });
 
 describe("Field", () => {

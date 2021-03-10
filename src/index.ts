@@ -32,17 +32,12 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
 };
 
 export function Schema (strict: StrictMode = false, messages = {}): any {
-  return function _Schema<T extends {new (...args: any[]): Record<string, unknown>}>(target: T): any  {
+  return function _Schema<T extends {new (): any}>(target: T): T {
     updateSchema(target.prototype, "$$strict", strict);
     const s = Reflect.getMetadata(SCHEMA_KEY, target.prototype) || {};
     const v = new FastestValidator({ messages, useNewCustomCheckerFunction: true });
     Reflect.defineMetadata(COMPILE_KEY, v.compile(s), target);
-    return class extends target {
-      constructor (...args: any[]) {
-        super(...args);
-        return this;
-      }
-    };
+    return target;
   };
 }
 
