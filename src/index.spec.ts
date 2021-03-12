@@ -593,6 +593,17 @@ describe("SchemaBase", () => {
     expect(v.validate).toBeCalledWith(t);
   });
 
+  it("should allow using class type in generics", () => {
+    @Schema()
+    class Test extends SchemaBase {}
+    function create<T extends SchemaBase> (klass: { new (): T }): T {
+      return new klass();
+    }
+    const t = create(Test);
+    expect(t).toBeDefined();
+    expect(t).toBeInstanceOf(Test);
+  });
+
 });
 
 describe("Custom", () => {
