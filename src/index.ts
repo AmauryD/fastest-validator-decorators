@@ -80,7 +80,9 @@ export function Nested (options: any | any[] = {}): any {
 }
 
 export class SchemaBase {
-  public constructor (obj: Record<string, unknown>) {
+  public constructor ();
+  public constructor (obj: Record<string, unknown>);
+  public constructor (obj?: Record<string, unknown>) {
     Object.assign(this, obj);
   }
 
