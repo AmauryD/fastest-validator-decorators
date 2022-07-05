@@ -24,23 +24,22 @@ import {
   Url,
   Custom,
   SchemaBase,
-  COMPILE_KEY
+  COMPILE_KEY,
+  AsyncSchema,
 } from "../src/index";
 import * as v from "../src/index";
+import { ValidationError } from "fastest-validator";
 
 describe("Schema", () => {
-
   it("Should default to not strict", () => {
     @Schema()
-    class Test {
-    }
+    class Test {}
     expect(getSchema(Test)).toEqual({ $$strict: false });
   });
 
   it("Should set strict", () => {
     @Schema(true)
-    class Test {
-    }
+    class Test {}
     expect(getSchema(Test)).toEqual({ $$strict: true });
   });
 
@@ -48,11 +47,11 @@ describe("Schema", () => {
     @Schema(true)
     class Test extends SchemaBase {
       @String()
-      prop!: string;
+        prop!: string;
       prop2!: string;
     }
     const t = new Test({
-      prop!: "prop",
+      prop: "prop",
       prop2: "prop2",
     });
     const result = validate(t);
@@ -63,11 +62,11 @@ describe("Schema", () => {
     @Schema()
     class Test extends SchemaBase {
       @String()
-      prop!: string;
+        prop!: string;
       prop2!: string;
     }
     const t = new Test({
-      prop!: "prop",
+      prop: "prop",
       prop2: "prop2",
     });
     expect(validate(t)).toEqual(true);
@@ -77,10 +76,10 @@ describe("Schema", () => {
     @Schema("remove")
     class Test extends SchemaBase {
       @String()
-      prop!: string;
+        prop!: string;
     }
     const t = new Test({
-      prop!: "prop",
+      prop: "prop",
       prop2: "prop2",
     });
     expect(validate(t)).toEqual(true);
@@ -91,7 +90,7 @@ describe("Schema", () => {
     @Schema()
     class Test extends SchemaBase {
       @String()
-      prop!: string;
+        prop!: string;
       prop2!: string;
     }
     const compiled = Reflect.getMetadata(COMPILE_KEY, Test);
@@ -104,359 +103,417 @@ describe("Schema", () => {
     @Schema()
     class Test extends SchemaBase {
       @String()
-      prop!: string;
+        prop!: string;
       prop2!: string;
     }
     const t = new Test({});
     expect(t.constructor.name).toEqual("Test");
   });
-
 });
 
 describe("Field", () => {
-
   it("Should apply type any as a default", () => {
     @Schema()
     class Test {
       @Field()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "any" } });
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "any" } });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Field({ type: "string" })
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "string" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "string" },
+    });
   });
 });
 
 describe("String", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @String()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "string", empty: false } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "string", empty: false },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @String({ type: "x", empty: true })
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "string", empty: true } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "string", empty: true },
+    });
   });
 });
 
 describe("Boolean", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Boolean()
-      prop!: boolean;
+        prop!: boolean;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "boolean" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "boolean" },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Boolean({ type: "x", optional: true })
-      prop!: boolean;
+        prop!: boolean;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "boolean", optional: true } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "boolean", optional: true },
+    });
   });
 });
 
 describe("Number", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Number()
-      prop!: number;
+        prop!: number;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "number", convert: true } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "number", convert: true },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Number({ type: "x", convert: false })
-      prop!: number;
+        prop!: number;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "number", convert: false } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "number", convert: false },
+    });
   });
 });
 
 describe("UUID", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @UUID()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "uuid" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "uuid" },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @UUID({ type: "x", optional: true })
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "uuid", optional: true } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "uuid", optional: true },
+    });
   });
 });
 
 describe("ObjectId", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @ObjectId()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "objectID" }});
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "objectID" },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @ObjectId({ type: "x", optional: true })
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "objectID", optional: true } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "objectID", optional: true },
+    });
   });
 });
 
 describe("Email", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Email()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "email" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "email" },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Email({ type: "x", optional: true })
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "email", optional: true } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "email", optional: true },
+    });
   });
 });
 
 describe("Instance", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Instance()
-      prop!: unknown;
+        prop!: unknown;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "class", instanceOf: Object } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "class", instanceOf: Object },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Instance({ type: "x", instanceOf: Buffer })
-      prop!: Buffer;
+        prop!: Buffer;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "class", instanceOf: Buffer } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "class", instanceOf: Buffer },
+    });
   });
 
   it("Should validate", () => {
     @Schema()
     class Test {
       @Instance({ instanceOf: Buffer })
-      prop!: Buffer;
+        prop!: Buffer;
     }
     const t = new Test();
     t.prop = Buffer.from("hello");
     expect(validate(t)).toEqual(true);
   });
-
 });
 
 describe("Currency", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Currency()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "currency", currencySymbol: "$" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "currency", currencySymbol: "$" },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Currency({ type: "x", currencySymbol: "£" })
-      prop!: Buffer;
+        prop!: Buffer;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "currency", currencySymbol: "£" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "currency", currencySymbol: "£" },
+    });
   });
 });
 
 describe("Func", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Func()
-      prop!: () => void;
+        prop!: () => void;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "function" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "function" },
+    });
   });
-
 });
 
 describe("Luhn", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Luhn()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "luhn" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "luhn" },
+    });
   });
-
 });
 
 describe("Mac", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Mac()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "mac" } });
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "mac" } });
   });
-
 });
 
 describe("Url", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Url()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "url" } });
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "url" } });
   });
-
 });
 
 describe("Date", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Date()
-      prop!: Date;
+        prop!: Date;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "date" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "date" },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Date({ type: "x", convert: true })
-      prop!: Date;
+        prop!: Date;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "date", convert: true } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "date", convert: true },
+    });
   });
 });
 
 describe("Enum", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Enum()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "enum", values: [] } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "enum", values: [] },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Enum({ type: "x", optional: true })
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "enum", optional: true, values: [] } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "enum", optional: true, values: [] },
+    });
   });
 });
 
 describe("Array", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Array()
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "array" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "array" },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Array({ type: "x", optional: true })
-      prop!: string;
+        prop!: string;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "array", optional: true } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "array", optional: true },
+    });
   });
 });
 
 describe("Nested", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Nested()
-      prop!: any;
+        prop!: any;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "object", strict: false, props: {} } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "object", strict: false, props: {} },
+    });
   });
 
   it("Should apply nested schema", () => {
     @Schema(true)
     class NestedTest {
       @Boolean()
-      prop!: boolean;
+        prop!: boolean;
     }
     @Schema()
     class Test {
       @Nested()
-      prop!: NestedTest;
+        prop!: NestedTest;
     }
     expect(getSchema(Test)).toEqual({
-      $$strict: false, prop!: {
-        type: "object", strict: true, props: {
-          prop!: { type: "boolean" }
-        }
-      }
+      $$strict: false,
+      prop: {
+        type: "object",
+        strict: true,
+        props: {
+          prop: { type: "boolean" },
+        },
+      },
     });
   });
 
@@ -464,25 +521,24 @@ describe("Nested", () => {
     @Schema()
     class NestedTest {
       @Boolean()
-      prop!: boolean;
+        prop!: boolean;
     }
     @Schema()
-    class Test { //eslint-disable-line
+    class Test {
+      //eslint-disable-line
       @Nested()
-      prop!: NestedTest;
+        prop!: NestedTest;
     }
     expect(getSchema(NestedTest)).toEqual({
       $$strict: false,
-      prop!: { "type": "boolean" }
+      prop: { type: "boolean" },
     });
   });
 });
 
 describe("validate", () => {
-
   it("Should throw an error if missing compiled validation method", () => {
-    class Test {
-    }
+    class Test {}
     expect(() => validate(new Test())).toThrow();
     expect(() => validate({})).toThrow();
   });
@@ -491,10 +547,10 @@ describe("validate", () => {
     @Schema()
     class Test extends SchemaBase {
       @Email()
-      prop!: string;
+        prop!: string;
     }
     const t = new Test({
-      prop!: "test@test.com",
+      prop: "test@test.com",
     });
     expect(validate(t)).toEqual(true);
   });
@@ -503,25 +559,24 @@ describe("validate", () => {
     @Schema()
     class Test extends SchemaBase {
       @Email()
-      prop!: string;
+        prop!: string;
     }
     const t = new Test({
-      prop!: "invalid",
+      prop: "invalid",
     });
     expect(validate(t)[0].field).toEqual("prop");
   });
 });
 
 describe("validateOrReject", () => {
-
   it("Should return true when valid", async () => {
     @Schema()
     class Test extends SchemaBase {
       @Email()
-      prop!: string;
+        prop!: string;
     }
     const t = new Test({
-      prop!: "test@test.com"
+      prop: "test@test.com",
     });
     expect(await validateOrReject(t)).toEqual(true);
   });
@@ -530,63 +585,66 @@ describe("validateOrReject", () => {
     @Schema()
     class Test extends SchemaBase {
       @Email()
-      prop!: string;
+        prop!: string;
     }
     const t = new Test({
-      prop!: "invalid",
+      prop: "invalid",
     });
     expect.assertions(1);
     try {
       await validateOrReject(t);
     } catch (e) {
-      expect(e[0].field).toEqual("prop");
+      expect((e as ValidationError[])[0].field).toEqual("prop");
     }
   });
 });
 
 describe("Any", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Any()
-      prop!: any;
+        prop!: any;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "any" }});
+    expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "any" } });
   });
 });
 
 describe("Equal", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Equal()
-      prop!: unknown;
+        prop!: unknown;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "equal" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "equal" },
+    });
   });
 
   it("Should apply passed options", () => {
     @Schema()
     class Test {
       @Equal({ type: "x", field: "otherField" })
-      prop!: unknown;
+        prop!: unknown;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: { type: "equal", field: "otherField" } });
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: { type: "equal", field: "otherField" },
+    });
   });
 });
 
 describe("SchemaBase", () => {
-
   it("Should call validate", () => {
     @Schema()
     class Test extends SchemaBase {
       @Email()
-      prop!: string;
+        prop!: string;
     }
     const t = new Test({
-      prop!: "invalid",
+      prop: "invalid",
     });
     jest.spyOn(v, "validate");
     t.validate();
@@ -603,42 +661,101 @@ describe("SchemaBase", () => {
     expect(t).toBeDefined();
     expect(t).toBeInstanceOf(Test);
   });
-
 });
 
 describe("Custom", () => {
-
   it("Should apply defaults", () => {
     @Schema()
     class Test {
       @Custom()
-      prop!: unknown;
+        prop!: unknown;
     }
-    expect(getSchema(Test)).toEqual({ $$strict: false, prop!: expect.objectContaining({ type: "custom" })});
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: expect.objectContaining({ type: "custom" }),
+    });
   });
 
   it("Should validate", () => {
     class X {}
     @Schema(false, {
-      mustBeX: "The value must be an instance of X"
+      mustBeX: "The value must be an instance of X",
     })
     class Test {
       @Custom({
-        check (value: any, errors: {type: string}[]){
+        check (value: any, errors: { type: string }[]) {
           if (!(value instanceof X)) {
-            errors.push({ type: "mustBeX"  });
+            errors.push({ type: "mustBeX" });
           }
           return value;
-        }
+        },
       })
-      prop!: X;
+        prop!: X;
     }
     const t = new Test();
     t.prop = {};
     expect(validate(t)[0].field).toEqual("prop");
-    expect(validate(t)[0].message).toEqual("The value must be an instance of X");
+    expect(validate(t)[0].message).toEqual(
+      "The value must be an instance of X"
+    );
     t.prop = new X();
     expect(validate(t)).toEqual(true);
   });
-
 });
+
+describe("Custom async", () => {
+  it("Should support async validation", async () => {
+    @AsyncSchema()
+    class Test {
+      @Custom({
+        async check (value: any) {
+          await new Promise((res) => setTimeout(res, 500));
+          return value;
+        },
+      })
+        prop!: unknown;
+    }
+
+    /**
+     * $$async key is removed for unknown reason from schema object at compile()
+     * https://github.com/icebob/fastest-validator/blob/a746f9311d3ebeda986e4896d39619bfc925ce65/lib/validator.js#L176
+     */
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      $$async: undefined,
+      prop: expect.objectContaining({ type: "custom" }),
+    });
+    expect(Reflect.getMetadata(COMPILE_KEY, Test)).toHaveProperty(
+      "async",
+      true
+    );
+    const t = new Test();
+    t.prop = "blah";
+    const promise = validate(t);
+    expect(promise).toBeInstanceOf(Promise);
+    expect(await promise).toEqual(true);
+  });
+
+  it("Validate with errors", async () => {
+    @AsyncSchema()
+    class Test {
+      @Custom({
+        async check (value: any, errors: { type: string }[]) {
+          await new Promise((res) => setTimeout(res, 500));
+          if (value !== 123) {
+            errors.push({ type: "not-123" });
+          }
+          return value;
+        },
+      })
+        prop!: unknown;
+    }
+
+    const t = new Test();
+    t.prop = "blah";
+    expect(await validate(t)).toEqual([
+      { field: "prop", message: undefined, type: "not-123" },
+    ]);
+  });
+});
+

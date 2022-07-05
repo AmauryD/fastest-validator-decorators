@@ -131,5 +131,30 @@ All decorators accept an object of options that apply to the type being used, fo
 
 **validateOrReject()** - Returns true or throws fastest-validator errors for a given instance
 
+## AsyncSchema
+
+In order to support async validation, you must use the @AsyncSchema decorator.
+
+```ts
+@AsyncSchema()
+class User {
+  @Custom({
+    async check (value: string, errors: { type: string }[]) {
+      const emailAlreadyExists = await db.userExistsById(value);
+      if (emailAlreadyExists) {
+        errors.push({ type: "unique", actual: value });
+      }
+      return value;
+    },
+  })
+  userId!: string;
+}
+
+const user = new User();
+user.userId = "123456789";
+
+await validate(user);
+```
+
 ## License
 Licensed under the MIT license.
