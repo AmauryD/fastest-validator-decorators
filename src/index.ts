@@ -1,12 +1,21 @@
 import "reflect-metadata";
-import type { ValidationError } from "fastest-validator";
+import type { ValidationError, ValidatorConstructorOptions } from "fastest-validator";
 import FastestValidator from "fastest-validator";
 
 export const SCHEMA_KEY = Symbol("propertyMetadata");
 export const COMPILE_KEY = Symbol("compileKey");
+
 type StrictMode = boolean | "remove";
 
-export const validate = (obj: { constructor: any }): true | ValidationError[] => {
+export interface SchemaOptions  {
+  async?: boolean,
+  strict?: StrictMode
+}
+
+/**
+ * Validates an instance of a @Schema().
+ */
+export const validate = (obj: { constructor: any }): true | ValidationError[] | Promise<true | ValidationError[]> => {
   const validate = Reflect.getMetadata(COMPILE_KEY, obj.constructor);
   if (!validate) {
     throw new Error("Obj is missing complied validation method");
@@ -14,8 +23,12 @@ export const validate = (obj: { constructor: any }): true | ValidationError[] =>
   return validate(obj);
 };
 
+/**
+ * Validates an instance of a @Schema().
+ * Throws the validation errors if errored.
+ */
 export const validateOrReject = async (obj: { constructor: any }): Promise<true | ValidationError[]> => {
-  const result = validate(obj);
+  const result = await validate(obj);
   if (result !== true) {
     throw result;
   }
@@ -27,17 +40,38 @@ export function getSchema (target: { prototype: any }): any {
 }
 
 const updateSchema = (target: any, key: string | symbol, options: any): void => {
-  const s = Reflect.getMetadata(SCHEMA_KEY, target) || {};
+  const s = Reflect.getMetadata(SCHEMA_KEY, target) ?? {};
   s[key] = options;
   Reflect.defineMetadata(SCHEMA_KEY, s, target);
 };
 
-export function Schema (strict: StrictMode = false, messages = {}): any {
+/**
+ * Creates a Schema for fastest-validator
+ * @param schemaOptions The options (prefixed with $$)
+ * @param fastestValidatorOptions Fastest validator options
+ * @returns 
+ */
+export function Schema (schemaOptions?: StrictMode | SchemaOptions, fastestValidatorOptions: ValidatorConstructorOptions = {}): any {
   return function _Schema<T extends {new (): any}>(target: T): T {
-    updateSchema(target.prototype, "$$strict", strict);
-    const s = Reflect.getMetadata(SCHEMA_KEY, target.prototype) || {};
-    const v = new FastestValidator({ messages, useNewCustomCheckerFunction: true });
-    Reflect.defineMetadata(COMPILE_KEY, v.compile(s), target);
+    /**
+     * Support old way of assign schema options
+     */
+    schemaOptions = typeof schemaOptions === "boolean" ||  typeof schemaOptions === "string" ? {
+      strict : schemaOptions
+    }: schemaOptions;
+
+    updateSchema(target.prototype, "$$strict", schemaOptions?.strict ?? false);
+    if (schemaOptions?.async !== undefined) {
+      updateSchema(target.prototype, "$$async", schemaOptions.async);
+    }
+  
+    const s = getSchema(target) || {};
+    const v = new FastestValidator({ useNewCustomCheckerFunction: true, ...fastestValidatorOptions });
+
+    /**
+     * Make a copy of the schema, in order to keep the original from being overriden or deleted by fastest-validator
+     */
+    Reflect.defineMetadata(COMPILE_KEY, v.compile({...s}), target);
     return target;
   };
 }
@@ -87,7 +121,7 @@ export class SchemaBase {
     Object.assign(this, obj);
   }
 
-  public validate (): true | ValidationError[] {
+  public validate (): true | ValidationError[] | Promise<true | ValidationError[]> {
     return validate(this);
   }
 }
