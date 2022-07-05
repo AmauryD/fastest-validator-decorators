@@ -6,8 +6,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tobydeh/fastest-validator-decorators.git"
+    "url": "git+https://github.com/AmauryD/fastest-validator-decorators.git"
   },
+  "maintainers": [
+    "AmauryD <deflorenne.amaury@gmail.com> (https://github.com/AmauryD)"
+  ],
   "scripts": {
     "clean": "rm -rf dist/",
     "build": "tsc",
