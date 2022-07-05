@@ -663,7 +663,7 @@ describe("SchemaBase", () => {
 });
 
 describe("Extending schemas", () => {
-  test("Does not mix up inherited properties", () => {
+  test("Does not mix up inherited properties in schema", () => {
     @Schema()
     class A {
       @String()
@@ -696,6 +696,52 @@ describe("Extending schemas", () => {
       a: { empty: false, type: "string" },
       $$strict: false,
       b: { empty: false, type: "string" },
+    });
+  });
+
+  test("Nested does not pollute parents", () => {
+    @Schema()
+    class A {
+      @String()
+        a!: string;
+    }
+
+    @Schema(true)
+    class Nest {
+      @String()
+        s!: string;
+
+      @Array()
+        sr!: string;
+    }
+
+    @Schema()
+    class B extends A {
+      @String()
+        b!: string;
+      @Nested()
+        nest!: Nest;
+    }
+
+
+    expect(getSchema(A)).toEqual({
+      a: { empty: false, type: "string" },
+      $$strict: false,
+    });
+    expect(getSchema(Nest)).toEqual({
+      s: { empty: false, type: "string" }, 
+      sr: { type: "array" } ,
+      $$strict: true
+    });
+    expect(getSchema(B)).toEqual({
+      b: { empty: false, type: "string" },
+      a: { empty: false, type: "string" },
+      nest : {
+        props: { s: { empty: false, type: "string" }, sr: { type: "array" } },
+        strict: true,
+        type: "object"
+      },
+      $$strict: false,
     });
   });
 
