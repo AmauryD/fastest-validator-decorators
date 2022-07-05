@@ -13,10 +13,29 @@ export interface SchemaOptions  {
 }
 
 /**
+ * Walks the prototype chain of an object
+ * Used for schema inheritance detection
+ * Maybe find a way to do the same thing with reflect metadata ?
+ */
+function getPrototypeChain (object: any): any[] {
+  let proto = object;
+  const protos: unknown[] = [object];
+
+  while (proto) {
+    proto = Object.getPrototypeOf(proto);
+    if (proto) {
+      protos.push(proto);
+    }
+  }
+
+  return protos;
+}
+
+/**
  * Validates an instance of a @Schema().
  */
 export const validate = (obj: { constructor: any }): true | ValidationError[] | Promise<true | ValidationError[]> => {
-  const validate = Reflect.getMetadata(COMPILE_KEY, obj.constructor);
+  const validate = Reflect.getOwnMetadata(COMPILE_KEY, obj.constructor);
   if (!validate) {
     throw new Error("Obj is missing complied validation method");
   }
@@ -36,11 +55,14 @@ export const validateOrReject = async (obj: { constructor: any }): Promise<true 
 };
 
 export function getSchema (target: { prototype: any }): any {
-  return Reflect.getMetadata(SCHEMA_KEY, target.prototype);
+  const chain = getPrototypeChain(target.prototype);
+  const schema = {};
+  Object.assign(schema, ...chain.map(c => Reflect.getOwnMetadata(SCHEMA_KEY, c)));
+  return schema;
 }
 
 const updateSchema = (target: any, key: string | symbol, options: any): void => {
-  const s = Reflect.getMetadata(SCHEMA_KEY, target) ?? {};
+  const s = Reflect.getOwnMetadata(SCHEMA_KEY, target) ?? {};
   s[key] = options;
   Reflect.defineMetadata(SCHEMA_KEY, s, target);
 };
@@ -65,7 +87,7 @@ export function Schema (schemaOptions?: StrictMode | SchemaOptions, fastestValid
       updateSchema(target.prototype, "$$async", schemaOptions.async);
     }
   
-    const s = getSchema(target) || {};
+    const s = getSchema(target);
     const v = new FastestValidator({ useNewCustomCheckerFunction: true, ...fastestValidatorOptions });
 
     /**
