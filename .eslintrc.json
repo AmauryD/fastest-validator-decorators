@@ -7,6 +7,7 @@
     "indent": ["error", 2, { "SwitchCase": 1 }],
     "camelcase": "error",
     "no-var": "error",
+    "no-console": "error",
     "eqeqeq": "error",
     "no-return-await": "error",
     "space-before-function-paren": ["error", "always"],

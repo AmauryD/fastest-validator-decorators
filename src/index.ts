@@ -4,8 +4,9 @@ import FastestValidator, { ValidationError } from "fastest-validator";
 export const SCHEMA_KEY = Symbol("propertyMetadata");
 export const COMPILE_KEY = Symbol("compileKey");
 type StrictMode = boolean | "remove";
+type ValidateReturnType = (true | ValidationError[]) | Promise<ValidationError[] | true>;
 
-export const validate = (obj: { constructor: any }): true | ValidationError[] => {
+export const validate = (obj: { constructor: any }): ValidateReturnType => {
   const validate = Reflect.getMetadata(COMPILE_KEY, obj.constructor);
   if (!validate) {
     throw new Error("Obj is missing complied validation method");
@@ -14,7 +15,7 @@ export const validate = (obj: { constructor: any }): true | ValidationError[] =>
 };
 
 export const validateOrReject = async (obj: { constructor: any }): Promise<true | ValidationError[]> => {
-  const result = validate(obj);
+  const result = await validate(obj);
   if (result !== true) {
     throw result;
   }
@@ -26,7 +27,7 @@ export function getSchema (target: { prototype: any }): any {
 }
 
 const updateSchema = (target: any, key: string | symbol, options: any): void => {
-  const s = Reflect.getMetadata(SCHEMA_KEY, target) || {};
+  const s = Reflect.getMetadata(SCHEMA_KEY, target) ?? {};
   s[key] = options;
   Reflect.defineMetadata(SCHEMA_KEY, s, target);
 };
@@ -34,7 +35,22 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
 export function Schema (strict: StrictMode = false, messages = {}): any {
   return function _Schema<T extends {new (): any}>(target: T): T {
     updateSchema(target.prototype, "$$strict", strict);
-    const s = Reflect.getMetadata(SCHEMA_KEY, target.prototype) || {};
+    const s = getSchema(target) ?? {};
+    const v = new FastestValidator({ messages, useNewCustomCheckerFunction: true });
+    Reflect.defineMetadata(COMPILE_KEY, v.compile(s), target);
+    return target;
+  };
+}
+
+/**
+ * Creates an async Schema
+ * https://github.com/icebob/fastest-validator#asynchronous-custom-validations
+ */
+export function AsyncSchema (strict: StrictMode = false, messages = {}): any {
+  return function <T extends {new (): any}>(target: T): T {
+    updateSchema(target.prototype, "$$async", true);
+    updateSchema(target.prototype, "$$strict", strict);
+    const s = getSchema(target) ?? {};
     const v = new FastestValidator({ messages, useNewCustomCheckerFunction: true });
     Reflect.defineMetadata(COMPILE_KEY, v.compile(s), target);
     return target;
@@ -86,7 +102,7 @@ export class SchemaBase {
     Object.assign(this, obj);
   }
 
-  public validate (): true | ValidationError[] {
+  public validate (): ValidateReturnType {
     return validate(this);
   }
 }
