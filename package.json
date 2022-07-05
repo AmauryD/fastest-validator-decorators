@@ -11,11 +11,11 @@
   "scripts": {
     "clean": "rm -rf dist/",
     "build": "tsc",
-    "prebuild": "npm run clean",
+    "prebuild": "pnpm run clean",
     "lint": "eslint --ignore-path .gitignore **/*.ts",
     "test": "jest",
-    "pretest": "npm run lint",
-    "prepublish": "npm run test && npm run build"
+    "pretest": "pnpm run lint",
+    "prepublish": "pnpm run test && pnpm run build"
   },
   "files": [
     "dist"

@@ -1,5 +1,6 @@
 import "reflect-metadata";
-import FastestValidator, { ValidationError } from "fastest-validator";
+import type { ValidationError } from "fastest-validator";
+import FastestValidator from "fastest-validator";
 
 export const SCHEMA_KEY = Symbol("propertyMetadata");
 export const COMPILE_KEY = Symbol("compileKey");
