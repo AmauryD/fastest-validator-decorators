@@ -92,6 +92,8 @@ export function Schema (schemaOptions?: StrictMode | SchemaOptions, messages = {
 
     /**
      * Make a copy of the schema, in order to keep the original from being overriden or deleted by fastest-validator
+     * $$async key is removed from schema object at compile()
+     * https://github.com/icebob/fastest-validator/blob/a746f9311d3ebeda986e4896d39619bfc925ce65/lib/validator.js#L176
      */
     Reflect.defineMetadata(COMPILE_KEY, v.compile({...s}), target);
     return target;
@@ -132,6 +134,7 @@ export function Nested (options: any | any[] = {}): any {
     const props = Object.assign({}, getSchema(t));
     const strict = props.$$strict || false;
     delete props.$$strict;
+    // never $$async in nested
     delete props.$$async;
     updateSchema(target, key, { ...options, props, strict, type: "object" });
   };

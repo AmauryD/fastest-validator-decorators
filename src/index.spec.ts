@@ -841,11 +841,7 @@ describe("Custom async", () => {
       })
         prop!: unknown;
     }
-
-    /**
-     * $$async key is removed for unknown reason from schema object at compile()
-     * https://github.com/icebob/fastest-validator/blob/a746f9311d3ebeda986e4896d39619bfc925ce65/lib/validator.js#L176
-     */
+    
     expect(getSchema(Test)).toEqual({
       $$strict: false,
       $$async: true,

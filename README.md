@@ -100,6 +100,7 @@ Add the following to your tsconfig.json
 All decorators accept an object of options that apply to the type being used, for a full list of options please refer to the fastest-validator [documentation](https://www.npmjs.com/package/fastest-validator).
 
 **@Schema(strict=false, messages={})** - Schema decorator. 
+**@Schema({ strict = false, async = false }, messages={})** - Schema decorator. 
 
 **@Field({})** - Generic decorator, no default properties set. Will apply all options to the schema.
 
@@ -143,7 +144,7 @@ All decorators accept an object of options that apply to the type being used, fo
 
 ```ts
 @Custom({
-  check (value: number, errors: {type: string}[]){
+  check (value: number, errors: {type: string, actual: number}[]){
     if (value % 2 !== 0) {
       errors.push({ type: "even", actual : value });
     }
