@@ -103,25 +103,83 @@ All decorators accept an object of options that apply to the type being used, fo
 
 **@Field({})** - Generic decorator, no default properties set. Will apply all options to the schema.
 
-**@String({})** - Applies { type: "string", empty: false }
+[**@String({})**](https://github.com/icebob/fastest-validator#string) - Applies { type: "string", empty: false }
 
-**@Boolean({})** - Applies { type: "boolean" }
+[**@Boolean({})**](https://github.com/icebob/fastest-validator#boolean) - Applies { type: "boolean" }
 
-**@Number({})** - Applies { type: "number", convert: true }
+[**@Number({})**](https://github.com/icebob/fastest-validator#number) - Applies { type: "number", convert: true }
 
-**@UUID({})** - Applies { type: "uuid" }
+[**@UUID({})**](https://github.com/icebob/fastest-validator#uuid) - Applies { type: "uuid" }
 
-**@ObjectId({})** - Applies { type: "string", pattern: /^[a-f\d]{24}$/i }
+[**@ObjectId({})**](https://github.com/icebob/fastest-validator#objectid) - Applies { type: "objectid" }
 
-**@Email({})** - Applies { type: "email" }
+[**@Email({})**](https://github.com/icebob/fastest-validator#email) - Applies { type: "email" }
 
-**@Date({})** - Applies { type: "date" }
+[**@Date({})**](https://github.com/icebob/fastest-validator#date) - Applies { type: "date" }
 
-**@Enum({})** - Applies { type: "enum" }
+[**@Enum({})**](https://github.com/icebob/fastest-validator#enum) - Applies { type: "enum" }
 
-**@Array({})** - Applies { type: "array" }
+[**@Array({})**](https://github.com/icebob/fastest-validator#array) - Applies { type: "array" }
+
+[**@Equal({})**](https://github.com/icebob/fastest-validator#equal) - Applies { type: "equal" }
+
+[**@Instance({})**](https://github.com/icebob/fastest-validator#class) - Applies { type: "class" }
+
+[**@Currency({})**](https://github.com/icebob/fastest-validator#currency) - Applies { type: "currency" }
+
+[**@Func({})**](https://github.com/icebob/fastest-validator#function) - Applies { type: "function" }
+
+[**@Luhn({})**](https://github.com/icebob/fastest-validator#luhn) - Applies { type: "luhn" }
+
+[**@Mac({})**](https://github.com/icebob/fastest-validator#mac) - Applies { type: "mac" }
+
+[**@Url({})**](https://github.com/icebob/fastest-validator#url) - Applies { type: "url" }
+
+[**@Any({})**](https://github.com/icebob/fastest-validator#any) - Applies { type: "any" }
 
 **@Nested({})** - Applies { type: "object", props: {} } (The props are gathered from the nested schema)
+
+[**@Custom({})**](https://github.com/icebob/fastest-validator#custom-validator) - Applies { type: "custom" }
+
+```ts
+@Custom({
+  check (value: number, errors: {type: string}[]){
+    if (value % 2 !== 0) {
+      errors.push({ type: "even", actual : value });
+    }
+    return value;
+  }
+})
+```
+
+## Async support
+
+In order to a schema to be async , you must add the `async: true` to `SchemaOptions`.
+
+:warning: Be carefull, when enabling async option, the return of the validate function becomes a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+
+```ts
+@Schema({
+  async: true,
+  strict: true
+})
+class User {
+  @Custom({
+    async check (value: string, errors: {type: string, actual: string}[]) {
+      const isUserInDB = await db.checkUserName(value);
+      if (isUserInDB) {
+        errors.push({ type: "unique", actual : value });
+      }
+      return value;
+    },
+  })
+  username!: string;
+}
+
+const user = new User();
+user.username = "James Bond";
+const result = await validate(user);
+```
 
 ## Available methods
 
