@@ -69,11 +69,11 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
 
 /**
  * Creates a Schema for fastest-validator
- * @param schemaOptions The options (prefixed with $$)
- * @param fastestValidatorOptions Fastest validator options
+ * @param schemaOptions The options (async, strict)
+ * @param messages
  * @returns 
  */
-export function Schema (schemaOptions?: StrictMode | SchemaOptions, fastestValidatorOptions: ValidatorConstructorOptions = {}): any {
+export function Schema (schemaOptions?: StrictMode | SchemaOptions, messages = {}): any {
   return function _Schema<T extends {new (): any}>(target: T): T {
     /**
      * Support old way of assign schema options
@@ -88,7 +88,7 @@ export function Schema (schemaOptions?: StrictMode | SchemaOptions, fastestValid
     }
   
     const s = getSchema(target);
-    const v = new FastestValidator({ useNewCustomCheckerFunction: true, ...fastestValidatorOptions });
+    const v = new FastestValidator({ useNewCustomCheckerFunction: true, messages });
 
     /**
      * Make a copy of the schema, in order to keep the original from being overriden or deleted by fastest-validator
@@ -132,6 +132,7 @@ export function Nested (options: any | any[] = {}): any {
     const props = Object.assign({}, getSchema(t));
     const strict = props.$$strict || false;
     delete props.$$strict;
+    delete props.$$async;
     updateSchema(target, key, { ...options, props, strict, type: "object" });
   };
 }

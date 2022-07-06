@@ -803,9 +803,7 @@ describe("Custom", () => {
   it("Should validate", () => {
     class X {}
     @Schema(false, {
-      messages: {
-        mustBeX: "The value must be an instance of X",
-      },
+      mustBeX: "The value must be an instance of X",
     })
     class Test {
       @Custom({
