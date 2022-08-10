@@ -71,7 +71,7 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
  * Creates a Schema for fastest-validator
  * @param schemaOptions The options (async, strict)
  * @param messages
- * @returns 
+ * @returns
  */
 export function Schema (schemaOptions?: StrictMode | SchemaOptions, messages = {}): any {
   return function _Schema<T extends {new (): any}>(target: T): T {
@@ -86,7 +86,7 @@ export function Schema (schemaOptions?: StrictMode | SchemaOptions, messages = {
     if (schemaOptions?.async !== undefined) {
       updateSchema(target.prototype, "$$async", schemaOptions.async);
     }
-  
+
     const s = getSchema(target);
     const v = new FastestValidator({ useNewCustomCheckerFunction: true, messages });
 
@@ -141,13 +141,23 @@ export function Nested (options: any | any[] = {}): any {
 }
 
 export class SchemaBase {
+  private __instance?: Record<string,unknown | undefined>;
+
   public constructor ();
   public constructor (obj: Record<string, unknown>);
   public constructor (obj?: Record<string, unknown>) {
     Object.assign(this, obj);
+    if (obj instanceof Object) {
+      this.__instance = obj;
+    }
   }
 
   public validate (): true | ValidationError[] | Promise<true | ValidationError[]> {
+    if (this.__instance) {
+      const obj = this.__instance;
+      delete this?.__instance;
+      Object.assign(this,obj);
+    }
     return validate(this);
   }
 }
