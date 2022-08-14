@@ -884,4 +884,18 @@ describe("Custom async", () => {
       { field: "prop", message: undefined, type: "not-123" },
     ]);
   });
+
+  it("SchemaBase with @Schema should override already defined properties", () => {
+    @Schema()
+    class Test extends SchemaBase {
+      prop = "hello";
+      prop2 = "there";
+    }
+    const t = new Test({
+      prop: "prop"
+    });
+
+    expect(t.prop).toEqual("prop");
+    expect(t.prop2).toEqual("there");
+  });
 });
