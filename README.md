@@ -37,7 +37,7 @@ class Entity2 {
   prop2: "one" | "two";
 
   @Email()
-  prop3: string;
+  prop3;
 
   @Number({ positive: true })
   prop4: number;
@@ -69,11 +69,13 @@ const result = validate(entity); // returns true or fastest-validator errors
 const result = await validateOrReject(entity); // returns true or throws fastest-validator errors
 ```
 
-The SchemaBase utility class reduces the verbosity of instantiating new objects by calling Object.assign in the constructor and provides a validate() method.
+The `SchemaBase` utility class reduces the verbosity of instantiating new objects by calling Object.assign in the constructor and provides a validate() method.
+
+:mega: This `SchemaBase` approach will probably be removed in 3.x release. See [#27](https://github.com/AmauryD/fastest-validator-decorators/issues/27).
 
 ```js
 @Schema()
-const Entity extends SchemaBase {
+class Entity extends SchemaBase {
   @Email()
   email: string;
 }
