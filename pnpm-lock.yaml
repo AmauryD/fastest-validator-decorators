@@ -14,7 +14,6 @@ specifiers:
   typescript: ^4.7.4
 
 dependencies:
-  fastest-validator: 1.12.0
   reflect-metadata: 0.1.13
 
 devDependencies:
@@ -23,6 +22,7 @@ devDependencies:
   '@typescript-eslint/eslint-plugin': 5.33.0_yy5c4q6zhpajzhorvwhnwvctfe
   '@typescript-eslint/parser': 5.33.0_4rv7y5c6xz3vfxwhbrcxxi73bq
   eslint: 8.22.0
+  fastest-validator: 1.12.0
   jest: 28.1.3_n3xoy7qirjmlijzezdtlwczclm
   ts-jest: 28.0.7_bi2kohzqnxavgozw3csgny5hju
   ts-node: 10.9.1_vugoqbkjnxc3odpmeek2omb3o4
@@ -1531,7 +1531,7 @@ packages:
 
   /fastest-validator/1.12.0:
     resolution: {integrity: sha512-Qc7oCVO9hAPz5GUONmToIoa95YWzoe7SLsrjIXTfCFf6HFQXxxWePXe8D+Kp/XCrr5H/pMJwP2xprW07wYv/BQ==}
-    dev: false
+    dev: true
 
   /fastq/1.13.0:
     resolution: {integrity: sha512-YpkpUnK8od0o1hmeSc7UUs/eB/vIPWJYjKck2QKIzAf71Vm1AAQ3EbuZB3g2JIy+pg+ERD0vqI79KyZiB2e2Nw==}

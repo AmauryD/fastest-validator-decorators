@@ -1,15 +1,14 @@
 import "reflect-metadata";
-import type { ValidationError } from "fastest-validator";
+import type { RuleAny, RuleArray, RuleBoolean, RuleClass, RuleCurrency, RuleCustom, RuleDate, RuleEmail, RuleEnum, RuleEqual, RuleFunction, RuleLuhn, RuleMac, RuleNumber, RuleObject, RuleObjectID, RuleString, RuleURL, RuleUUID, ValidationError, ValidationSchema, ValidatorConstructorOptions } from "fastest-validator";
 import FastestValidator from "fastest-validator";
 
 export const SCHEMA_KEY = Symbol("propertyMetadata");
 export const COMPILE_KEY = Symbol("compileKey");
 
-type StrictMode = boolean | "remove";
 
 export interface SchemaOptions  {
-  async?: boolean,
-  strict?: StrictMode
+  async?: ValidationSchema["$$async"],
+  strict?: ValidationSchema["$$strict"]
 }
 
 /**
@@ -73,34 +72,16 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
  * @param messages
  * @returns 
  */
-export function Schema (schemaOptions?: StrictMode | SchemaOptions, messages = {}): any {
+export function Schema (schemaOptions?: SchemaOptions, options : ValidatorConstructorOptions = {}): any {
   return function _Schema<T extends { new (...args: any[]) }>(target: T): T {
-    /**
-     * Support old way of assign schema options
-     */
-    schemaOptions = typeof schemaOptions === "boolean" ||  typeof schemaOptions === "string" ? {
-      strict : schemaOptions
-    }: schemaOptions;
-
-    if (target.prototype instanceof SchemaBase) {
-      const name = target.name;
-      target = class extends target {
-        constructor (...args: any[]) {
-          super(...args);
-          Object.assign(this, args[0]);
-        }
-      };
-      // the extended class has the same name than the 'parent' class
-      Object.defineProperty(target, "name", {value: name, writable: false});
-    }
-
     updateSchema(target.prototype, "$$strict", schemaOptions?.strict ?? false);
     if (schemaOptions?.async !== undefined) {
       updateSchema(target.prototype, "$$async", schemaOptions.async);
     }
   
     const s = getSchema(target);
-    const v = new FastestValidator({ useNewCustomCheckerFunction: true, messages });
+    // enforce useNewCustomCheckerFunction to true
+    const v = new FastestValidator({ ...options, useNewCustomCheckerFunction: true });
 
     /**
      * Make a copy of the schema, in order to keep the original from being overriden or deleted by fastest-validator
@@ -114,35 +95,35 @@ export function Schema (schemaOptions?: StrictMode | SchemaOptions, messages = {
   };
 }
 
-export const decoratorFactory = (mandatory = {}, defaults = {}) => {
-  return function (options: any | any[] = {}): any {
+export const decoratorFactory = <T extends RuleCustom>(mandatory: Partial<T> = {}, defaults: Partial<T> = {}) => {
+  return function (options: Partial<T> = {}): any {
     return (target: any, key: string | symbol): any => {
       updateSchema(target, key, { ...defaults, ...options, ...mandatory });
     };
   };
 };
 
-export const Field = decoratorFactory({}, { type: "any" });
-export const String = decoratorFactory({ type: "string" }, { empty: false });
-export const Boolean = decoratorFactory({ type: "boolean" });
-export const Number = decoratorFactory({ type: "number" }, { convert: true });
-export const UUID = decoratorFactory({ type: "uuid" });
-export const ObjectId = decoratorFactory({ type: "objectID" });
-export const Email = decoratorFactory({ type: "email" });
-export const Date = decoratorFactory({ type: "date" });
-export const Enum = decoratorFactory({ type: "enum" }, { values: [] });
-export const Array = decoratorFactory({ type: "array" });
-export const Any = decoratorFactory({ type: "any" });
-export const Equal = decoratorFactory({ type: "equal" });
-export const Instance = decoratorFactory({ type: "class" }, { instanceOf: Object });
-export const Currency = decoratorFactory({ type: "currency" }, { currencySymbol: "$" });
-export const Func = decoratorFactory({ type: "function" });
-export const Luhn = decoratorFactory({ type: "luhn" });
-export const Mac = decoratorFactory({ type: "mac" });
-export const Url = decoratorFactory({ type: "url" });
-export const Custom = decoratorFactory({ type: "custom" }, { check (){/**/} });
+export const Field = decoratorFactory<RuleCustom>({},{ type : "any" });
+export const String = decoratorFactory<RuleString>({ type: "string" }, { empty: false });
+export const Boolean = decoratorFactory<RuleBoolean>({ type: "boolean" });
+export const Number = decoratorFactory<RuleNumber>({ type: "number" }, { convert: true });
+export const UUID = decoratorFactory<RuleUUID>({ type: "uuid" });
+export const ObjectId = decoratorFactory<RuleObjectID>({ type: "objectID" });
+export const Email = decoratorFactory<RuleEmail>({ type: "email" });
+export const Date = decoratorFactory<RuleDate>({ type: "date" });
+export const Enum = decoratorFactory<RuleEnum>({ type: "enum" }, { values: [] });
+export const Array = decoratorFactory<RuleArray>({ type: "array" });
+export const Any = decoratorFactory<RuleAny>({ type: "any" });
+export const Equal = decoratorFactory<RuleEqual>({ type: "equal" });
+export const Instance = decoratorFactory<RuleClass>({ type: "class" }, { });
+export const Currency = decoratorFactory<RuleCurrency>({ type: "currency" }, { currencySymbol: "$" });
+export const Func = decoratorFactory<RuleFunction>({ type: "function" });
+export const Luhn = decoratorFactory<RuleLuhn>({ type: "luhn" });
+export const Mac = decoratorFactory<RuleMac>({ type: "mac" });
+export const Url = decoratorFactory<RuleURL>({ type: "url" });
+export const Custom = decoratorFactory<RuleCustom>({ type: "custom" }, { check (){/**/} });
 
-export function Nested (options: any | any[] = {}): any {
+export function Nested (options: Partial<RuleCustom> = {}): any {
   return (target: any, key: string): any => {
     const t = Reflect.getMetadata("design:type", target, key);
     const props = Object.assign({}, getSchema(t));
@@ -152,19 +133,4 @@ export function Nested (options: any | any[] = {}): any {
     delete props.$$async;
     updateSchema(target, key, { ...options, props, strict, type: "object" });
   };
-}
-
-export class SchemaBase {
-  /**
-   * We keep the constructor signature, but it will do nothing
-   * The Object.assign() is done in the extended constructor from the @Schema decorator.
-   * This SchemaBase class will probably be removed in the future
-   * 
-   */
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  public constructor (obj?: Record<string, unknown>) {}
-
-  public validate (): true | ValidationError[] | Promise<true | ValidationError[]> {
-    return validate(this);
-  }
 }
