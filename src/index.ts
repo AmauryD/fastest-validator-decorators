@@ -155,16 +155,14 @@ export function Nested (options: any | any[] = {}): any {
 }
 
 export class SchemaBase {
-  public constructor (obj?: Record<string, unknown>);
-
   /**
    * We keep the constructor signature, but it will do nothing
    * The Object.assign() is done in the extended constructor from the @Schema decorator.
    * This SchemaBase class will probably be removed in the future
    * 
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  public constructor (_obj?: Record<string, unknown>) {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
+  public constructor (obj?: Record<string, unknown>) {}
 
   public validate (): true | ValidationError[] | Promise<true | ValidationError[]> {
     return validate(this);
