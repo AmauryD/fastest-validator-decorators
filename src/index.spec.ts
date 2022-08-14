@@ -81,6 +81,7 @@ describe("Schema", () => {
       prop: "prop",
       prop2: "prop2",
     });
+
     expect(validate(t)).toEqual(true);
     expect(Object.keys(t)).toEqual(["prop"]);
   });
@@ -95,6 +96,7 @@ describe("Schema", () => {
     const compiled = Reflect.getMetadata(COMPILE_KEY, Test);
     expect(compiled).toBeTruthy();
     const t = new Test({});
+    
     expect(compiled).toBe(Reflect.getMetadata(COMPILE_KEY, t.constructor));
   });
 
@@ -551,6 +553,7 @@ describe("validate", () => {
     const t = new Test({
       prop: "test@test.com",
     });
+    
     expect(validate(t)).toEqual(true);
   });
 

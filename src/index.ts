@@ -74,13 +74,25 @@ const updateSchema = (target: any, key: string | symbol, options: any): void => 
  * @returns 
  */
 export function Schema (schemaOptions?: StrictMode | SchemaOptions, messages = {}): any {
-  return function _Schema<T extends {new (): any}>(target: T): T {
+  return function _Schema<T extends { new (...args: any[]) }>(target: T): T {
     /**
      * Support old way of assign schema options
      */
     schemaOptions = typeof schemaOptions === "boolean" ||  typeof schemaOptions === "string" ? {
       strict : schemaOptions
     }: schemaOptions;
+
+    if (target.prototype instanceof SchemaBase) {
+      const name = target.name;
+      target = class extends target {
+        constructor (...args: any[]) {
+          super(...args);
+          Object.assign(this, args[0]);
+        }
+      };
+      // the extended class has the same name than the 'parent' class
+      Object.defineProperty(target, "name", {value: name, writable: false});
+    }
 
     updateSchema(target.prototype, "$$strict", schemaOptions?.strict ?? false);
     if (schemaOptions?.async !== undefined) {
@@ -96,6 +108,8 @@ export function Schema (schemaOptions?: StrictMode | SchemaOptions, messages = {
      * https://github.com/icebob/fastest-validator/blob/a746f9311d3ebeda986e4896d39619bfc925ce65/lib/validator.js#L176
      */
     Reflect.defineMetadata(COMPILE_KEY, v.compile({...s}), target);
+    
+
     return target;
   };
 }
@@ -141,11 +155,16 @@ export function Nested (options: any | any[] = {}): any {
 }
 
 export class SchemaBase {
-  public constructor ();
-  public constructor (obj: Record<string, unknown>);
-  public constructor (obj?: Record<string, unknown>) {
-    Object.assign(this, obj);
-  }
+  public constructor (obj?: Record<string, unknown>);
+
+  /**
+   * We keep the constructor signature, but it will do nothing
+   * The Object.assign() is done in the extended constructor from the @Schema decorator.
+   * This SchemaBase class will probably be removed in the future
+   * 
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public constructor (_obj?: Record<string, unknown>) {}
 
   public validate (): true | ValidationError[] | Promise<true | ValidationError[]> {
     return validate(this);
