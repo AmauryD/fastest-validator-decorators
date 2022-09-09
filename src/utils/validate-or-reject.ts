@@ -5,8 +5,8 @@ import { validate } from "./validate";
  * Validates an instance of a @Schema().
  * Throws the validation errors if errored.
  */
-export const validateOrReject = async (obj: InstanceType<any>): Promise<true | ValidationError[]> => {
-  const result = await validate(obj);
+export const validateOrReject = async (schemaInstance: InstanceType<any>): Promise<true | ValidationError[]> => {
+  const result = await validate(schemaInstance);
   if (result !== true) {
     throw result;
   }
