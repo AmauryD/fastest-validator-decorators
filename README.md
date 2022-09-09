@@ -6,6 +6,8 @@
 # Fastest Validator Decorators
 > Decorators for [fastest-validator](https://github.com/icebob/fastest-validator#readme)
 
+:boom: Coming from 1.x ? See the [Migration Guide](MIGRATING.md).
+
 ## Example usage
 
 ```js
@@ -52,7 +54,7 @@ const schema = getSchema(Entity2); // get the fastest-validator schema
   prop1: { type: "uuid" },
   prop2: { type: "enum", values: ["one", "two"] },
   prop3: { type: "email" },
-  prop4: { type: "number", positive: true, convert: true },
+  prop4: { type: "number", positive: true },
   prop5: { type: "object", strict: true, props: {
     prop1: { type: "array", items: "string" }
   }}
@@ -73,8 +75,10 @@ const result = await validateOrReject(entity); // returns true or throws fastest
 
 Install the package
 ```
-npm install --save fastest-validator-decorators
+npm install --save fastest-validator-decorators fastest-validator
 ```
+
+:sparkles: fastest-validator is a peerDependency.
 
 Add the following to your tsconfig.json
 ```
@@ -86,16 +90,15 @@ Add the following to your tsconfig.json
 
 All decorators accept an object of options that apply to the type being used, for a full list of options please refer to the fastest-validator [documentation](https://www.npmjs.com/package/fastest-validator).
 
-**@Schema(strict=false, messages={})** - Schema decorator. 
 **@Schema({ strict = false, async = false }, messages={})** - Schema decorator. 
 
 **@Field({})** - Generic decorator, no default properties set. Will apply all options to the schema.
 
-[**@String({})**](https://github.com/icebob/fastest-validator#string) - Applies { type: "string", empty: false }
+[**@String({})**](https://github.com/icebob/fastest-validator#string) - Applies { type: "string" }
 
 [**@Boolean({})**](https://github.com/icebob/fastest-validator#boolean) - Applies { type: "boolean" }
 
-[**@Number({})**](https://github.com/icebob/fastest-validator#number) - Applies { type: "number", convert: true }
+[**@Number({})**](https://github.com/icebob/fastest-validator#number) - Applies { type: "number" }
 
 [**@UUID({})**](https://github.com/icebob/fastest-validator#uuid) - Applies { type: "uuid" }
 
@@ -142,7 +145,7 @@ All decorators accept an object of options that apply to the type being used, fo
 
 ## Async support
 
-In order to a schema to be async , you must add the `async: true` to `SchemaOptions`.
+In order to a schema to be async , you must add the `async: true` to [SchemaOptions](https://github.com/AmauryD/fastest-validator-decorators/blob/6e34ebf41eae5ed60bb1f8bf0dc4379e72136f4e/src/schema.ts#L7).
 
 :warning: Be carefull, when enabling async option, the return of the validate function becomes a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 
@@ -177,5 +180,7 @@ const result = await validate(user);
 
 **validateOrReject()** - Returns true or throws fastest-validator errors for a given instance
 
+
 ## License
 Licensed under the MIT license.
+
