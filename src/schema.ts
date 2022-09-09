@@ -9,12 +9,6 @@ export interface SchemaOptions  {
   strict?: ValidationSchema["$$strict"]
 }
 
-/**
- * Creates a Schema for fastest-validator
- * @param schemaOptions The options (async, strict)
- * @param messages
- * @returns 
- */
 export function Schema (schemaOptions?: SchemaOptions, validatorOptions : ValidatorConstructorOptions = {}): any {
   return function _Schema<T extends { new (...args: any[]) }>(target: T): T {
     updateSchema(target.prototype, "$$strict", schemaOptions?.strict ?? false);

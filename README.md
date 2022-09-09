@@ -24,7 +24,9 @@ import {
   validateOrReject
 } from "fastest-validator-decorators";
 
-@Schema(true)
+@Schema({
+  strict: true
+})
 class Entity1 {
   @Array({ items: "string"})
   prop1: string[];

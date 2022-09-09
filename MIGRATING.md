@@ -67,7 +67,8 @@ The old decorators were applying some properties by default (like converting num
 
 - applies `{ type: "number" }`
 
-## Schema option is now an object.
+
+## Schema first option is now an object.
 
 For better readability the first option to the @Schema decorator is an object.
 
@@ -85,6 +86,37 @@ class X {}
 // applies strict
 @Schema({
     strict: true
+})
+class X {}
+```
+
+## Schema second option has changed.
+
+Before, second option was used to create only custom validation messages. It has been replaced by a more flexible option `ValidatorConstructorOptions`. You need to wrap your old message object in a message key in order to migrate.
+
+### Before 
+
+```ts
+// applies strict
+@Schema(true, {
+    evenNumber: "The '{field}' field must be an even number! Actual: {actual}"
+})
+class X {}
+```
+
+### After 
+
+```ts
+// applies strict
+@Schema({
+    strict: true
+}, {
+    messages: {
+        // Register our new error message text
+        evenNumber: "The '{field}' field must be an even number! Actual: {actual}"
+    },
+    // other fastest validator options ...
+    plugins: [],
 })
 class X {}
 ```
