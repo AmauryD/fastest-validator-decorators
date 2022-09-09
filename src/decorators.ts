@@ -1,14 +1,14 @@
 import type { RuleCustom, RuleString, RuleBoolean, RuleNumber, RuleUUID, RuleObjectID, RuleEmail, RuleDate, RuleEnum, RuleArray, RuleAny, RuleEqual, RuleClass, RuleCurrency, RuleFunction, RuleLuhn, RuleMac, RuleURL, RuleCustomInline } from "fastest-validator";
 import { getSchema } from "./utils/get-schema";
 import { updateSchema } from "./utils/update-schema";
-import type { Except , HasRequiredKeys , RemoveIndexSignature } from "type-fest";
+import type { Class, Except , HasRequiredKeys , RemoveIndexSignature } from "type-fest";
 
 type RemoveTypeFromRule<T  extends RuleCustom> = Except<T, "type">;
 type IsMandatory<T  extends object> =  HasRequiredKeys<RemoveIndexSignature<T>> extends true ? [param: T] : [param?: T];
 
 export const decoratorFactory = <T extends object>(mandatory: Partial<T> = {}) => {
   return function (...options: IsMandatory<T>): any {
-    return (target: any, key: string | symbol): any => {
+    return (target: Class<any>, key: string | symbol): any => {
       updateSchema(target, key, { ...options[0], ...mandatory });
     };
   };
@@ -35,7 +35,7 @@ export const Url = decoratorFactory<RemoveTypeFromRule<RuleURL>>({ type: "url" }
 export const Custom = decoratorFactory<RemoveTypeFromRule<RuleCustomInline>>({ type: "custom" });
   
 export function Nested (options: Partial<RuleCustom> = {}): any {
-  return (target: any, key: string): any => {
+  return (target: Class<any>, key: string): any => {
     const t = Reflect.getMetadata("design:type", target, key);
     const props = Object.assign({}, getSchema(t));
     const strict = props.$$strict || false;

@@ -8,14 +8,15 @@ specifiers:
   eslint: ^8.23.0
   fastest-validator: ^1.15.0
   jest: ^29.0.2
-  reflect-metadata: ^0.1.13
+  reflect-metadata: ~0.1.13
   ts-jest: ^29.0.0
   ts-node: ^10.9.1
-  type-fest: ^2.19.0
+  type-fest: ~2.19.0
   typescript: ^4.8.3
 
 dependencies:
   reflect-metadata: 0.1.13
+  type-fest: 2.19.0
 
 devDependencies:
   '@types/jest': 29.0.0
@@ -27,7 +28,6 @@ devDependencies:
   jest: 29.0.2_n3xoy7qirjmlijzezdtlwczclm
   ts-jest: 29.0.0_wwfqqmkoyydtjs56cbrp7ttepi
   ts-node: 10.9.1_qfqzs7yh73wls4vundes7z5jam
-  type-fest: 2.19.0
   typescript: 4.8.3
 
 packages:
@@ -2973,7 +2973,7 @@ packages:
   /type-fest/2.19.0:
     resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
     engines: {node: '>=12.20'}
-    dev: true
+    dev: false
 
   /typescript/4.8.3:
     resolution: {integrity: sha512-goMHfm00nWPa8UvR/CPSvykqf6dVV8x/dp0c5mFTMTIu0u0FlGWRioyy7Nn0PGAdHxpJZnuO/ut+PpQ8UiHAig==}
