@@ -114,10 +114,12 @@ describe("Schema", () => {
 });
 
 describe("Field", () => {
-  it("Should apply type any as a default", () => {
+  it("Should apply nothing by default", () => {
     @Schema()
     class Test {
-      @Field()
+      @Field({
+        type: "any"
+      })
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "any" } });
@@ -145,7 +147,7 @@ describe("String", () => {
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,
-      prop: { type: "string", empty: false },
+      prop: { type: "string"},
     });
   });
 
@@ -197,7 +199,7 @@ describe("Number", () => {
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,
-      prop: { type: "number", convert: true },
+      prop: { type: "number" },
     });
   });
 
@@ -218,7 +220,7 @@ describe("UUID", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @UUID()
+      @UUID({})
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({
@@ -244,7 +246,7 @@ describe("ObjectId", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @ObjectId()
+      @ObjectId({})
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({
@@ -270,7 +272,7 @@ describe("Email", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Email()
+      @Email({})
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({
@@ -303,7 +305,7 @@ describe("Instance", () => {
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,
-      prop: { type: "class", "instanceOf": Object, },
+      prop: { type: "class",  instanceOf: Object },
     });
   });
 
@@ -335,12 +337,12 @@ describe("Currency", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Currency()
+      @Currency({})
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,
-      prop: { type: "currency", currencySymbol: "$" },
+      prop: { type: "currency" },
     });
   });
 
@@ -352,7 +354,7 @@ describe("Currency", () => {
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,
-      prop: { type: "currency", currencySymbol: "£" },
+      prop: { type: "currency", "currencySymbol": "£", },
     });
   });
 });
@@ -361,7 +363,7 @@ describe("Func", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Func()
+      @Func({})
         prop!: () => void;
     }
     expect(getSchema(Test)).toEqual({
@@ -375,7 +377,7 @@ describe("Luhn", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Luhn()
+      @Luhn({})
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({
@@ -389,7 +391,7 @@ describe("Mac", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Mac()
+      @Mac({})
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "mac" } });
@@ -400,7 +402,7 @@ describe("Url", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Url()
+      @Url({})
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({ $$strict: false, prop: { type: "url" } });
@@ -411,7 +413,7 @@ describe("Date", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Date()
+      @Date({})
         prop!: Date;
     }
     expect(getSchema(Test)).toEqual({
@@ -437,7 +439,9 @@ describe("Enum", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Enum()
+      @Enum({
+        values: []
+      })
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({
@@ -449,7 +453,7 @@ describe("Enum", () => {
   it("Should apply passed options", () => {
     @Schema()
     class Test {
-      @Enum({ type: "x" as any, optional: true })
+      @Enum({ type: "x" as any, values: [], optional: true })
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({
@@ -463,9 +467,7 @@ describe("Array", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Array({
-        
-      })
+      @Array({})
         prop!: string;
     }
     expect(getSchema(Test)).toEqual({
@@ -552,7 +554,7 @@ describe("validate", () => {
   it("Should return true when valid", () => {
     @Schema()
     class Test {
-      @Email()
+      @Email({})
         prop!: string;
     }
     const t = new Test();
@@ -564,7 +566,7 @@ describe("validate", () => {
   it("Should return validation errors", () => {
     @Schema()
     class Test {
-      @Email()
+      @Email({})
         prop!: string;
     }
     const t = new Test();
@@ -577,7 +579,7 @@ describe("validateOrReject", () => {
   it("Should return true when valid", async () => {
     @Schema()
     class Test {
-      @Email()
+      @Email({})
         prop!: string;
     }
     const t = new Test();
@@ -588,7 +590,7 @@ describe("validateOrReject", () => {
   it("Should throw validation errors", async () => {
     @Schema()
     class Test {
-      @Email()
+      @Email({})
         prop!: string;
     }
     const t = new Test();
@@ -617,7 +619,7 @@ describe("Equal", () => {
   it("Should apply defaults", () => {
     @Schema()
     class Test {
-      @Equal()
+      @Equal({})
         prop!: unknown;
     }
     expect(getSchema(Test)).toEqual({
@@ -660,19 +662,19 @@ describe("Extending schemas", () => {
     }
 
     expect(getSchema(A)).toEqual({
-      a: { empty: false, type: "string" },
+      a: { type: "string" },
       $$strict: false,
     });
     expect(getSchema(B)).toEqual({
-      b: { empty: false, type: "string" },
-      a: { empty: false, type: "string" },
+      b: { type: "string" },
+      a: { type: "string" },
       $$strict: false,
     });
     expect(getSchema(C)).toEqual({
-      c: { empty: false, type: "string" },
-      a: { empty: false, type: "string" },
+      c: { type: "string" },
+      a: { type: "string" },
       $$strict: false,
-      b: { empty: false, type: "string" },
+      b: { type: "string" },
     });
   });
 
@@ -704,19 +706,19 @@ describe("Extending schemas", () => {
 
 
     expect(getSchema(A)).toEqual({
-      a: { empty: false, type: "string" },
+      a: { type: "string" },
       $$strict: false,
     });
     expect(getSchema(Nest)).toEqual({
-      s: { empty: false, type: "string" }, 
+      s: { type: "string" }, 
       sr: { type: "array" } ,
       $$strict: true
     });
     expect(getSchema(B)).toEqual({
-      b: { empty: false, type: "string" },
-      a: { empty: false, type: "string" },
+      b: { type: "string" },
+      a: { type: "string" },
       nest : {
-        props: { s: { empty: false, type: "string" }, sr: { type: "array" } },
+        props: { s: { type: "string" }, sr: { type: "array" } },
         strict: true,
         type: "object"
       },
@@ -768,14 +770,18 @@ describe("Extending schemas", () => {
 
 describe("Custom", () => {
   it("Should apply defaults", () => {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    const check = function check (): void {};
     @Schema()
     class Test {
-      @Custom()
+      @Custom({
+        check
+      })
         prop!: unknown;
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,
-      prop: expect.objectContaining({ type: "custom" }),
+      prop: expect.objectContaining({ type: "custom", check }),
     });
   });
 

@@ -11,6 +11,7 @@ specifiers:
   reflect-metadata: ^0.1.13
   ts-jest: ^29.0.0
   ts-node: ^10.9.1
+  type-fest: ^2.19.0
   typescript: ^4.8.3
 
 dependencies:
@@ -26,6 +27,7 @@ devDependencies:
   jest: 29.0.2_n3xoy7qirjmlijzezdtlwczclm
   ts-jest: 29.0.0_wwfqqmkoyydtjs56cbrp7ttepi
   ts-node: 10.9.1_qfqzs7yh73wls4vundes7z5jam
+  type-fest: 2.19.0
   typescript: 4.8.3
 
 packages:
@@ -2966,6 +2968,11 @@ packages:
   /type-fest/0.21.3:
     resolution: {integrity: sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==}
     engines: {node: '>=10'}
+    dev: true
+
+  /type-fest/2.19.0:
+    resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
+    engines: {node: '>=12.20'}
     dev: true
 
   /typescript/4.8.3:
