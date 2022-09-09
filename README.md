@@ -69,21 +69,6 @@ const result = validate(entity); // returns true or fastest-validator errors
 const result = await validateOrReject(entity); // returns true or throws fastest-validator errors
 ```
 
-The `SchemaBase` utility class reduces the verbosity of instantiating new objects by calling Object.assign in the constructor and provides a validate() method.
-
-:mega: This `SchemaBase` approach will probably be removed in 3.x release. See [#27](https://github.com/AmauryD/fastest-validator-decorators/issues/27).
-
-```js
-@Schema()
-class Entity extends SchemaBase {
-  @Email()
-  email: string;
-}
-
-const entity = new Entity({ email: 'some@email.com' });
-const result = entity.validate();
-```
-
 ## Setup
 
 Install the package

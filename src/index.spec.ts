@@ -1,6 +1,4 @@
 import {
-  validate,
-  validateOrReject,
   getSchema,
   Schema,
   Field,
@@ -22,10 +20,12 @@ import {
   Luhn,
   Mac,
   Url,
-  Custom,
-  COMPILE_KEY,
+  Custom
 } from "../src/index";
 import type { ValidationError } from "fastest-validator";
+import { COMPILE_KEY } from "./constants";
+import { validate } from "./utils/validate";
+import { validateOrReject } from "./utils/validate-or-reject";
 
 describe("Schema", () => {
   it("Should default to not strict", () => {
@@ -347,7 +347,7 @@ describe("Currency", () => {
   it("Should apply passed options", () => {
     @Schema()
     class Test {
-      @Currency({ type: "x" as any as any, currencySymbol: "£" })
+      @Currency({ type: "x" as any, currencySymbol: "£" })
         prop!: Buffer;
     }
     expect(getSchema(Test)).toEqual({
