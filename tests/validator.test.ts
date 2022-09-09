@@ -23,9 +23,9 @@ import {
   Custom
 } from "../src/index";
 import type { ValidationError } from "fastest-validator";
-import { COMPILE_KEY } from "./constants";
-import { validate } from "./utils/validate";
-import { validateOrReject } from "./utils/validate-or-reject";
+import { COMPILE_KEY } from "../src/constants";
+import { validate } from "../src/utils/validate";
+import { validateOrReject } from "../src/utils/validate-or-reject";
 
 describe("Schema", () => {
   it("Should default to not strict", () => {
