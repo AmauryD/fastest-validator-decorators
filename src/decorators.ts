@@ -33,16 +33,34 @@ export const Luhn = decoratorFactory<RemoveTypeFromRule<RuleLuhn>>({ type: "luhn
 export const Mac = decoratorFactory<RemoveTypeFromRule<RuleMac>>({ type: "mac" });
 export const Url = decoratorFactory<RemoveTypeFromRule<RuleURL>>({ type: "url" });
 export const Custom = decoratorFactory<RemoveTypeFromRule<RuleCustomInline>>({ type: "custom" });
-  
+
+function getNestedObject (schemaClass: Class<any>, options: Record<string, unknown>): Record<string, unknown> {
+  const props = Object.assign({}, getSchema(schemaClass));
+  const strict = props.$$strict || false;
+  delete props.$$strict;
+  // never $$async in nested
+  delete props.$$async;
+  return  { ...options, props, strict, type: "object" };
+}
+
+function wrapIntoArray (items: Record<string, unknown>): Record<string, unknown> {
+  return { type: "array", items };
+}
+
 export function Nested (options: Partial<RuleCustom> = {}): any {
   return (target: Class<any>, key: string): any => {
     const t = Reflect.getMetadata("design:type", target, key);
-    const props = Object.assign({}, getSchema(t));
-    const strict = props.$$strict || false;
-    delete props.$$strict;
-    // never $$async in nested
-    delete props.$$async;
-    updateSchema(target, key, { ...options, props, strict, type: "object" });
+    updateSchema(target, key, getNestedObject(t, options));
   };
 }
-  
+
+type NestedArrayOptions = Partial<RuleCustom> & { validator: Class<any> };
+
+export function NestedArray (options: NestedArrayOptions): any {
+  return (target: Class<any>, key: string): any => {
+    const validator = options.validator;
+    // force Typescript to be happy
+    delete (options as Partial<NestedArrayOptions>).validator;
+    updateSchema(target, key, wrapIntoArray(getNestedObject(validator, options)));
+  };
+}

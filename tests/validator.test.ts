@@ -20,7 +20,8 @@ import {
   Luhn,
   Mac,
   Url,
-  Custom
+  Custom,
+  NestedArray
 } from "../src/index";
 import type { ValidationError } from "fastest-validator";
 import { COMPILE_KEY } from "../src/constants";
@@ -499,6 +500,58 @@ describe("Nested", () => {
     expect(getSchema(Test)).toEqual({
       $$strict: false,
       prop: { type: "object", strict: false, props: {} },
+    });
+  });
+
+  it("Validates nested array", () => {
+    @Schema()
+    class TestNested {
+      @String({
+        empty: false
+      })
+      public declare name: string;
+    }
+    @Schema()
+    class Test {
+      @NestedArray({
+        type: "array",
+        validator: TestNested
+      })
+        prop!: TestNested[];
+    }
+    
+    const test = new Test();
+
+    const schema  = getSchema(Test);
+    
+    test.prop = [{
+      name: "a"
+    }, {
+      name: ""
+    }];
+    
+    const errors = validate(test);
+
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toStrictEqual({
+      type: "stringEmpty",
+      message: "The 'prop[1].name' field must not be empty.",
+      field: "prop[1].name",
+      actual: ""
+    });
+    
+    expect(schema).toStrictEqual({
+      prop: {
+        type: "array",
+        items: { type: "object", props: {
+          "name": {
+            "empty": false,
+            "type": "string",
+          },
+        }, strict: false }
+      },
+      "$$strict": false
     });
   });
 
