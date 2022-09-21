@@ -517,7 +517,7 @@ describe("Nested", () => {
         type: "array",
         validator: TestNested
       })
-        prop!: TestNested[];
+        prop!:  TestNested[];
     }
     
     const test = new Test();
