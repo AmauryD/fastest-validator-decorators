@@ -43,8 +43,8 @@ function getNestedObject (schemaClass: Class<any>, options: Record<string, unkno
   return  { ...options, props, strict, type: "object" };
 }
 
-function wrapIntoArray (items: Record<string, unknown>): Record<string, unknown> {
-  return { type: "array", items };
+function wrapIntoArray (items: Record<string, unknown>, options: Record<string, unknown>): Record<string, unknown> {
+  return { type: "array", ...options, items };
 }
 
 export function Nested (options: Partial<RuleCustom> = {}): any {
@@ -54,13 +54,13 @@ export function Nested (options: Partial<RuleCustom> = {}): any {
   };
 }
 
-type NestedArrayOptions = Partial<RuleCustom> & { validator: Class<any> };
+type NestedArrayOptions = Except<Partial<RuleArray>, "items"> & { validator: Class<any> };
 
 export function NestedArray (options: NestedArrayOptions): any {
   return (target: Class<any>, key: string): any => {
     const validator = options.validator;
     // force Typescript to be happy
     delete (options as Partial<NestedArrayOptions>).validator;
-    updateSchema(target, key, wrapIntoArray(getNestedObject(validator, options)));
+    updateSchema(target, key, wrapIntoArray(getNestedObject(validator, {}), options));
   };
 }

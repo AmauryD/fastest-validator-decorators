@@ -31,25 +31,25 @@ import { validateOrReject } from "../src/utils/validate-or-reject";
 describe("Schema", () => {
   it("Should default to not strict", () => {
     @Schema()
-    class Test {}
+    class Test { }
     expect(getSchema(Test)).toEqual({ $$strict: false });
   });
 
   it("Should set strict", () => {
-    @Schema({ strict: true})
-    class Test {}
+    @Schema({ strict: true })
+    class Test { }
     expect(getSchema(Test)).toEqual({ $$strict: true });
   });
 
   it("Should validate strict", () => {
-    @Schema({ strict: true})
+    @Schema({ strict: true })
     class Test {
       @String()
         prop!: string;
       prop2!: string;
     }
     const t = new Test();
-    Object.assign(t,{
+    Object.assign(t, {
       prop: "prop",
       prop2: "prop2",
     });
@@ -65,7 +65,7 @@ describe("Schema", () => {
       prop2!: string;
     }
     const t = new Test();
-    Object.assign(t,{
+    Object.assign(t, {
       prop: "prop",
       prop2: "prop2",
     });
@@ -79,7 +79,7 @@ describe("Schema", () => {
         prop!: string;
     }
     const t = new Test();
-    Object.assign(t,{
+    Object.assign(t, {
       prop: "prop",
       prop2: "prop2",
     });
@@ -98,7 +98,7 @@ describe("Schema", () => {
     const compiled = Reflect.getMetadata(COMPILE_KEY, Test);
     expect(compiled).toBeTruthy();
     const t = new Test();
-    
+
     expect(compiled).toBe(Reflect.getMetadata(COMPILE_KEY, t.constructor));
   });
 
@@ -148,7 +148,7 @@ describe("String", () => {
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,
-      prop: { type: "string"},
+      prop: { type: "string" },
     });
   });
 
@@ -306,7 +306,7 @@ describe("Instance", () => {
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,
-      prop: { type: "class",  instanceOf: Object },
+      prop: { type: "class", instanceOf: Object },
     });
   });
 
@@ -503,60 +503,8 @@ describe("Nested", () => {
     });
   });
 
-  it("Validates nested array", () => {
-    @Schema()
-    class TestNested {
-      @String({
-        empty: false
-      })
-      public declare name: string;
-    }
-    @Schema()
-    class Test {
-      @NestedArray({
-        type: "array",
-        validator: TestNested
-      })
-        prop!:  TestNested[];
-    }
-    
-    const test = new Test();
-
-    const schema  = getSchema(Test);
-    
-    test.prop = [{
-      name: "a"
-    }, {
-      name: ""
-    }];
-    
-    const errors = validate(test);
-
-
-    expect(errors).toHaveLength(1);
-    expect(errors[0]).toStrictEqual({
-      type: "stringEmpty",
-      message: "The 'prop[1].name' field must not be empty.",
-      field: "prop[1].name",
-      actual: ""
-    });
-    
-    expect(schema).toStrictEqual({
-      prop: {
-        type: "array",
-        items: { type: "object", props: {
-          "name": {
-            "empty": false,
-            "type": "string",
-          },
-        }, strict: false }
-      },
-      "$$strict": false
-    });
-  });
-
   it("Should apply nested schema", () => {
-    @Schema({ strict: true})
+    @Schema({ strict: true })
     class NestedTest {
       @Boolean()
         prop!: boolean;
@@ -599,7 +547,7 @@ describe("Nested", () => {
 
 describe("validate", () => {
   it("Should throw an error if missing compiled validation method", () => {
-    class Test {}
+    class Test { }
     expect(() => validate(new Test())).toThrow();
     expect(() => validate({})).toThrow();
   });
@@ -612,7 +560,7 @@ describe("validate", () => {
     }
     const t = new Test();
     t.prop = "test@test.com";
-    
+
     expect(validate(t)).toEqual(true);
   });
 
@@ -738,13 +686,13 @@ describe("Extending schemas", () => {
         a!: string;
     }
 
-    @Schema({ strict: true})
+    @Schema({ strict: true })
     class Nest {
       @String()
         s!: string;
 
       @Array({
-        
+
       })
         sr!: string;
     }
@@ -763,14 +711,14 @@ describe("Extending schemas", () => {
       $$strict: false,
     });
     expect(getSchema(Nest)).toEqual({
-      s: { type: "string" }, 
-      sr: { type: "array" } ,
+      s: { type: "string" },
+      sr: { type: "array" },
       $$strict: true
     });
     expect(getSchema(B)).toEqual({
       b: { type: "string" },
       a: { type: "string" },
-      nest : {
+      nest: {
         props: { s: { type: "string" }, sr: { type: "array" } },
         strict: true,
         type: "object"
@@ -824,7 +772,7 @@ describe("Extending schemas", () => {
 describe("Custom", () => {
   it("Should apply defaults", () => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    const check = function check (): void {};
+    const check = function check (): void { };
     @Schema()
     class Test {
       @Custom({
@@ -839,7 +787,7 @@ describe("Custom", () => {
   });
 
   it("Should validate", () => {
-    class X {}
+    class X { }
     @Schema({
       strict: false
     }, {
@@ -883,7 +831,7 @@ describe("Custom async", () => {
       })
         prop!: unknown;
     }
-    
+
     expect(getSchema(Test)).toEqual({
       $$strict: false,
       $$async: true,
@@ -922,5 +870,103 @@ describe("Custom async", () => {
     expect(await validate(t)).toEqual([
       { field: "prop", message: undefined, type: "not-123" },
     ]);
+  });
+});
+
+describe("Nested Array", () => {
+  it("Validates nested array", () => {
+    @Schema()
+    class TestNested {
+      @String({
+        empty: false
+      })
+      public declare name: string;
+    }
+    @Schema()
+    class Test {
+      @NestedArray({
+        type: "array",
+        validator: TestNested
+      })
+        prop!: TestNested[];
+    }
+
+    const test = new Test();
+
+    const schema = getSchema(Test);
+
+    test.prop = [{
+      name: "a"
+    }, {
+      name: ""
+    }];
+
+    const errors = validate(test);
+
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toStrictEqual({
+      type: "stringEmpty",
+      message: "The 'prop[1].name' field must not be empty.",
+      field: "prop[1].name",
+      actual: ""
+    });
+
+    expect(schema).toStrictEqual({
+      prop: {
+        type: "array",
+        items: {
+          type: "object", props: {
+            "name": {
+              "empty": false,
+              "type": "string",
+            },
+          }, strict: false
+        }
+      },
+      "$$strict": false
+    });
+  });
+
+  it("Optional nested array", () => {
+    @Schema()
+    class TestNested {
+      @String({
+        empty: false
+      })
+      public declare name: string;
+    }
+    @Schema()
+    class Test {
+      @NestedArray({
+        type: "array",
+        validator: TestNested,
+        optional: true
+      })
+        prop!: TestNested[];
+    }
+
+    const test = new Test();
+
+    const schema = getSchema(Test);
+    const validationResult = validate(test);
+
+    expect(schema).toStrictEqual({
+      prop: {
+        type: "array",
+        "optional": true,
+        items: {
+          type: "object", props: {
+            "name": {
+              "empty": false,
+              "type": "string",
+            },
+          }, strict: false
+        }
+      },
+      "$$strict": false
+    });
+    expect(validationResult).toStrictEqual(true);
+
   });
 });
