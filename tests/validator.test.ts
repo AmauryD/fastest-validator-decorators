@@ -885,7 +885,6 @@ describe("Nested Array", () => {
     @Schema()
     class Test {
       @NestedArray({
-        type: "array",
         validator: TestNested
       })
         prop!: TestNested[];
@@ -939,7 +938,6 @@ describe("Nested Array", () => {
     @Schema()
     class Test {
       @NestedArray({
-        type: "array",
         validator: TestNested,
         optional: true
       })

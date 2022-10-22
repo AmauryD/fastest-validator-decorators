@@ -132,6 +132,8 @@ All decorators accept an object of options that apply to the type being used, fo
 
 **@Nested({})** - Applies { type: "object", props: {} } (The props are gathered from the nested schema)
 
+**@NestedArray({ validator: `<ValidatorSchema>` })** - Applies { type: "array", "items": { type :"object",  props: { ... } }} (The props are gathered from the nested schema)
+
 [**@Custom({})**](https://github.com/icebob/fastest-validator#custom-validator) - Applies { type: "custom" }
 
 ```ts
