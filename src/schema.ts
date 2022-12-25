@@ -3,6 +3,7 @@ import { getSchema } from "./utils/get-schema";
 import { updateSchema } from "./utils/update-schema";
 import FastestValidator from "fastest-validator";
 import { COMPILE_KEY } from "./constants";
+import type { Constructor } from "type-fest";
 
 export interface SchemaOptions  {
   async?: ValidationSchema["$$async"],
@@ -10,7 +11,7 @@ export interface SchemaOptions  {
 }
 
 export function Schema (schemaOptions?: SchemaOptions, validatorOptions : ValidatorConstructorOptions = {}): any {
-  return function _Schema<T extends { new (...args: any[]) }>(target: T): T {
+  return function _Schema<T extends Constructor<any>> (target: T): T {
     updateSchema(target.prototype, "$$strict", schemaOptions?.strict ?? false);
     if (schemaOptions?.async !== undefined) {
       updateSchema(target.prototype, "$$async", schemaOptions.async);

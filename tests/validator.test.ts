@@ -54,7 +54,7 @@ describe("Schema", () => {
       prop2: "prop2",
     });
     const result = validate(t);
-    expect(result[0].type).toEqual("objectStrict");
+    expect((result as ValidationError[])[0].type).toEqual("objectStrict");
   });
 
   it("Should validate not strict", () => {
@@ -572,7 +572,7 @@ describe("validate", () => {
     }
     const t = new Test();
     t.prop = "Invalid";
-    expect(validate(t)[0].field).toEqual("prop");
+    expect((validate(t) as ValidationError[])[0].field).toEqual("prop");
   });
 });
 
@@ -808,8 +808,9 @@ describe("Custom", () => {
     }
     const t = new Test();
     t.prop = {};
-    expect(validate(t)[0].field).toEqual("prop");
-    expect(validate(t)[0].message).toEqual(
+    const validation = validate(t) as ValidationError[];
+    expect(validation[0].field).toEqual("prop");
+    expect(validation[0].message).toEqual(
       "The value must be an instance of X"
     );
     t.prop = new X();
@@ -900,7 +901,7 @@ describe("Nested Array", () => {
       name: ""
     }];
 
-    const errors = validate(test);
+    const errors = validate(test) as ValidationError[];
 
 
     expect(errors).toHaveLength(1);
@@ -965,6 +966,5 @@ describe("Nested Array", () => {
       "$$strict": false
     });
     expect(validationResult).toStrictEqual(true);
-
   });
 });

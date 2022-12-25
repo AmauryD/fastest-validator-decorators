@@ -1,24 +1,16 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "module": "commonjs",
+    "declaration": true,
     "outDir": "dist",
-    "rootDir": ".",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noImplicitAny": false,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "alwaysStrict": true,
-    "declaration": true,
-    "strict":true,
-    "types": [
-      "node",
-      "jest"
+    "lib": [
+        "dom",
+        "es2015"
     ],
-    "sourceMap": false,
-    "target": "es6",
-    "plugins": [
-    ]
   },
   "exclude": [
     "node_modules",
