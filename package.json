@@ -1,7 +1,7 @@
 {
   "name": "fastest-validator-decorators",
   "author": "Toby de Havilland",
-  "version": "2.0.0",
+  "version": "2.0.0-beta.0",
   "description": "Fastest validator decorators",
   "license": "MIT",
   "main": "./dist/index.cjs",
