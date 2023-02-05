@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
     "strict": true,
-    "module": "commonjs",
+    "module": "ES2022",
     "declaration": true,
     "outDir": "dist",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "lib": [
         "dom",
-        "es2015"
+        "ESNext"
     ],
   },
   "exclude": [

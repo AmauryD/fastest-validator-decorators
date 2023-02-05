@@ -1,5 +1,5 @@
 import type { ValidationError } from "fastest-validator";
-import { validate } from "./validate";
+import { validate } from "./validate.js";
 
 /**
  * Validates an instance of a @Schema().

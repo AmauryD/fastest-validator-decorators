@@ -1,8 +1,8 @@
 import type { ValidationSchema, ValidatorConstructorOptions } from "fastest-validator";
-import { getSchema } from "./utils/get-schema";
-import { updateSchema } from "./utils/update-schema";
+import { getSchema } from "./utils/get-schema.js";
+import { updateSchema } from "./utils/update-schema.js";
 import FastestValidator from "fastest-validator";
-import { COMPILE_KEY } from "./constants";
+import { COMPILE_KEY } from "./constants.js";
 import type { Constructor } from "type-fest";
 
 export interface SchemaOptions  {
@@ -18,6 +18,7 @@ export function Schema (schemaOptions?: SchemaOptions, validatorOptions : Valida
     }
     
     const s = getSchema(target);
+    
     // enforce useNewCustomCheckerFunction to true
     const v = new FastestValidator({ ...validatorOptions, useNewCustomCheckerFunction: true });
   

@@ -14,7 +14,7 @@ export function getPrototypeChain (object: Class<any>): Class<any>[] {
     if (proto) {
       protos.push(proto);
     }
-  }
+  }  
   
   return protos;
 }

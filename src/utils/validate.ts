@@ -1,5 +1,5 @@
 import type { ValidationError } from "fastest-validator";
-import { COMPILE_KEY } from "../constants";
+import { COMPILE_KEY } from "../constants.js";
 
 /**
  * Validates an instance of a @Schema().

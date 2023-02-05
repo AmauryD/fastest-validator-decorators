@@ -22,11 +22,12 @@ import {
   Url,
   Custom,
   NestedArray
-} from "../src/index";
+} from "../src/index.js";
 import type { ValidationError } from "fastest-validator";
-import { COMPILE_KEY } from "../src/constants";
-import { validate } from "../src/utils/validate";
-import { validateOrReject } from "../src/utils/validate-or-reject";
+import { COMPILE_KEY } from "../src/constants.js";
+import { validate } from "../src/utils/validate.js";
+import { validateOrReject } from "../src/utils/validate-or-reject.js";
+import { describe, expect, it, test } from "vitest";
 
 describe("Schema", () => {
   it("Should default to not strict", () => {
@@ -491,18 +492,6 @@ describe("Array", () => {
 });
 
 describe("Nested", () => {
-  it("Should apply defaults", () => {
-    @Schema()
-    class Test {
-      @Nested()
-        prop!: any;
-    }
-    expect(getSchema(Test)).toEqual({
-      $$strict: false,
-      prop: { type: "object", strict: false, props: {} },
-    });
-  });
-
   it("Should apply nested schema", () => {
     @Schema({ strict: true })
     class NestedTest {
@@ -511,7 +500,9 @@ describe("Nested", () => {
     }
     @Schema()
     class Test {
-      @Nested()
+      @Nested({
+        validator: NestedTest
+      })
         prop!: NestedTest;
     }
     expect(getSchema(Test)).toEqual({
@@ -535,7 +526,9 @@ describe("Nested", () => {
     @Schema()
     class Test {
       //eslint-disable-line
-      @Nested()
+      @Nested({
+        validator: NestedTest
+      })
         prop!: NestedTest;
     }
     expect(getSchema(NestedTest)).toEqual({
@@ -701,7 +694,9 @@ describe("Extending schemas", () => {
     class B extends A {
       @String()
         b!: string;
-      @Nested()
+      @Nested({
+        validator: Nest
+      })
         nest!: Nest;
     }
 

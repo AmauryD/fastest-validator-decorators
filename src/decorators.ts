@@ -1,6 +1,6 @@
 import type { RuleCustom, RuleString, RuleBoolean, RuleNumber, RuleUUID, RuleObjectID, RuleEmail, RuleDate, RuleEnum, RuleArray, RuleAny, RuleEqual, RuleClass, RuleCurrency, RuleFunction, RuleLuhn, RuleMac, RuleURL, RuleCustomInline } from "fastest-validator";
-import { getSchema } from "./utils/get-schema";
-import { updateSchema } from "./utils/update-schema";
+import { getSchema } from "./utils/get-schema.js";
+import { updateSchema } from "./utils/update-schema.js";
 import type { Class, Except , HasRequiredKeys , RemoveIndexSignature } from "type-fest";
 
 type RemoveTypeFromRule<T  extends RuleCustom> = Except<T, "type">;
@@ -47,9 +47,15 @@ function wrapIntoArray (items: Record<string, unknown>, options: Record<string, 
   return { type: "array", ...options, items };
 }
 
-export function Nested (options: Partial<RuleCustom> = {}): any {
+type NestedOptions = Partial<RuleCustom> & { validator?: Class<any> };
+
+export function Nested (options: NestedOptions = {}): any {
   return (target: Class<any>, key: string): any => {
-    const t = Reflect.getMetadata("design:type", target, key);
+    const t = Reflect.getMetadata("design:type", target, key) ?? options.validator;
+    if (!t) {
+      throw new Error("Cannot get \"design:type\". Please use the validator option to @Nested"); 
+    }
+    delete (options as Partial<NestedArrayOptions>).validator;
     updateSchema(target, key, getNestedObject(t, options));
   };
 }
