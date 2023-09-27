@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ 16 ]
+        node: [ 16, 18, 20 ]
     name: Node ${{ matrix.node }} tests
     steps:
       - name: Checkout
@@ -22,11 +22,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: pnpm/action-setup@v2
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 7
+          version: 8
           run_install: true
       - name: Run tests
         run: pnpm test
