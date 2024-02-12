@@ -5,7 +5,7 @@ import type { Class } from "type-fest";
  * Used for schema inheritance detection
  * Maybe find a way to do the same thing with reflect metadata ?
  */
-export function getPrototypeChain (object: Class<any>): Class<any>[] {
+export function getPrototypeChain (object: any): Class<any>[] {
   let proto = object;
   const protos: Class<any>[] = [object];
   

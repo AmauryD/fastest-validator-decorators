@@ -130,6 +130,16 @@ All decorators accept an object of options that apply to the type being used, fo
 
 [**@Any({})**](https://github.com/icebob/fastest-validator#any) - Applies { type: "any" }
 
+[**@Multi({})**](https://github.com/icebob/fastest-validator#multi) - Applies { type: "multi" }
+
+Also resolves to multi if multiple decorators are stacked on a single field.
+
+```ts
+@String()
+@Number()
+prop1: string | number;
+```
+
 **@Nested({})** - Applies { type: "object", props: {} } (The props are gathered from the nested schema)
 
 **@NestedArray({ validator: `<ValidatorSchema>` })** - Applies { type: "array", "items": { type :"object",  props: { ... } }} (The props are gathered from the nested schema)
