@@ -1,4 +1,4 @@
-import type { RuleCustom, RuleString, RuleBoolean, RuleNumber, RuleUUID, RuleObjectID, RuleEmail, RuleDate, RuleEnum, RuleArray, RuleAny, RuleEqual, RuleClass, RuleCurrency, RuleFunction, RuleLuhn, RuleMac, RuleURL, RuleCustomInline } from "fastest-validator";
+import type { RuleCustom, RuleString, RuleBoolean, RuleNumber, RuleUUID, RuleObjectID, RuleEmail, RuleDate, RuleEnum, RuleArray, RuleAny, RuleEqual, RuleClass, RuleCurrency, RuleFunction, RuleLuhn, RuleMac, RuleURL, RuleCustomInline, RuleMulti } from "fastest-validator";
 import { getSchema } from "./utils/get-schema.js";
 import { updateSchema } from "./utils/update-schema.js";
 import type { Class, Except , HasRequiredKeys , OmitIndexSignature } from "type-fest";
@@ -16,6 +16,7 @@ export const decoratorFactory = <T extends object>(mandatory: Partial<T> = {}) =
 
 export const Field = decoratorFactory<RuleCustom>({});
 export const String = decoratorFactory<RemoveTypeFromRule<RuleString>>({ type: "string" });
+export const Multi = decoratorFactory<RemoveTypeFromRule<RuleMulti>>({ type: "multi" });
 export const Boolean = decoratorFactory<RemoveTypeFromRule<RuleBoolean>>({ type: "boolean" });
 export const Number = decoratorFactory<RemoveTypeFromRule<RuleNumber>>({ type: "number" });
 export const UUID = decoratorFactory<RemoveTypeFromRule<RuleUUID>>({ type: "uuid" });

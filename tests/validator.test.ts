@@ -524,6 +524,7 @@ describe("Nested", () => {
         prop!: boolean;
     }
     @Schema()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     class Test {
       //eslint-disable-line
       @Nested({
