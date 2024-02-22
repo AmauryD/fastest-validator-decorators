@@ -500,7 +500,9 @@ describe("Nested", () => {
     }
     @Schema()
     class Test {
-      @Nested()
+      @Nested({
+        validator: NestedTest
+      })
         prop!: NestedTest;
     }
     expect(getSchema(Test)).toEqual({
