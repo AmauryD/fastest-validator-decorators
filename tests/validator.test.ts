@@ -492,7 +492,7 @@ describe("Array", () => {
 });
 
 describe("Nested", () => {
-  it("Should apply nested schema as field validator", () => {
+  it("Should apply nested schema", () => {
     @Schema({ strict: true })
     class NestedTest {
       @Boolean()
@@ -515,7 +515,7 @@ describe("Nested", () => {
     });
   });
 
-  it("Should apply nested schema as options validator", () => {
+  it("Should apply nullable nested schema", () => {
     @Schema({ strict: true })
     class NestedTest {
       @Boolean()
