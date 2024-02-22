@@ -492,7 +492,30 @@ describe("Array", () => {
 });
 
 describe("Nested", () => {
-  it("Should apply nested schema", () => {
+  it("Should apply nested schema as field validator", () => {
+    @Schema({ strict: true })
+    class NestedTest {
+      @Boolean()
+        prop!: boolean;
+    }
+    @Schema()
+    class Test {
+      @Nested()
+        prop!: NestedTest;
+    }
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: {
+        type: "object",
+        strict: true,
+        props: {
+          prop: { type: "boolean" },
+        },
+      },
+    });
+  });
+
+  it("Should apply nested schema as options validator", () => {
     @Schema({ strict: true })
     class NestedTest {
       @Boolean()
@@ -503,7 +526,7 @@ describe("Nested", () => {
       @Nested({
         validator: NestedTest
       })
-        prop!: NestedTest;
+        prop?: NestedTest | null;
     }
     expect(getSchema(Test)).toEqual({
       $$strict: false,

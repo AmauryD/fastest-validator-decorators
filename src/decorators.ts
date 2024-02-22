@@ -52,7 +52,7 @@ type NestedOptions = Partial<RuleCustom> & { validator?: Class<any> };
 
 export function Nested (options: NestedOptions = {}): any {
   return (target: Class<any>, key: string): any => {
-    const t = Reflect.getMetadata("design:type", target, key) ?? options.validator;
+    const t = options.validator ?? Reflect.getMetadata("design:type", target, key);
     if (!t) {
       throw new Error(`Cannot get \"design:type\" of ${key}. Please use the validator option to @Nested`); 
     }
