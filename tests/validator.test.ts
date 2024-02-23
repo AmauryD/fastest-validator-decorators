@@ -517,6 +517,31 @@ describe("Nested", () => {
     });
   });
 
+  it("Should apply nullable nested schema", () => {
+    @Schema({ strict: true })
+    class NestedTest {
+      @Boolean()
+        prop!: boolean;
+    }
+    @Schema()
+    class Test {
+      @Nested({
+        validator: NestedTest
+      })
+        prop?: NestedTest | null;
+    }
+    expect(getSchema(Test)).toEqual({
+      $$strict: false,
+      prop: {
+        type: "object",
+        strict: true,
+        props: {
+          prop: { type: "boolean" },
+        },
+      },
+    });
+  });
+
   it("Should not remove nested $$strict", () => {
     @Schema()
     class NestedTest {
