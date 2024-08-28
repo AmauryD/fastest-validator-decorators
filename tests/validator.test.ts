@@ -30,6 +30,15 @@ import { validateOrReject } from "../src/utils/validate-or-reject.js";
 import { describe, expect, it, test } from "vitest";
 
 describe("Schema", () => {
+  it("Allows custom metadata", () => {
+    @Schema({
+      $$test: true,
+      $$prop: "test",
+    })
+    class Test { }
+    expect(getSchema(Test)).toEqual({ $$strict: false, $$test: true, $$prop: "test" });
+  });
+ 
   it("Should default to not strict", () => {
     @Schema()
     class Test { }

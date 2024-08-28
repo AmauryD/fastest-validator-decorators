@@ -1,20 +1,27 @@
-import type { ValidationSchema, ValidatorConstructorOptions } from "fastest-validator";
+import type { ValidationRule, ValidationSchema, ValidatorConstructorOptions } from "fastest-validator";
 import { getSchema } from "./utils/get-schema.js";
 import { updateSchema } from "./utils/update-schema.js";
 import FastestValidator from "fastest-validator";
 import { COMPILE_KEY } from "./constants.js";
 import type { Constructor } from "type-fest";
 
-export interface SchemaOptions  {
-  async?: ValidationSchema["$$async"],
-  strict?: ValidationSchema["$$strict"]
-}
+export type SchemaOptions<T> = {
+  async?: ValidationSchema<T>["$$async"],
+  strict?: ValidationSchema<T>["$$strict"],
+  [key: string]: ValidationRule | undefined | any
+};
 
-export function Schema (schemaOptions?: SchemaOptions, validatorOptions : ValidatorConstructorOptions = {}): any {
+export function Schema<T> (schemaOptions?: SchemaOptions<T>, validatorOptions : ValidatorConstructorOptions = {}): any {
   return function _Schema<T extends Constructor<any>> (target: T): T {
     updateSchema(target.prototype, "$$strict", schemaOptions?.strict ?? false);
     if (schemaOptions?.async !== undefined) {
       updateSchema(target.prototype, "$$async", schemaOptions.async);
+    }
+
+    if (schemaOptions) {
+      for (const element of Object.keys(schemaOptions).filter((key) => key !== "async" && key !== "strict")) {
+        updateSchema(target.prototype, element, schemaOptions[element as keyof SchemaOptions<T>]);
+      }
     }
     
     const s = getSchema(target);

@@ -8,7 +8,7 @@ import {
   Multi,
   validate,
 } from "../src/index.js";
-import { describe } from "node:test";
+import { describe } from "vitest";
 
 describe("Multi decorator", () => {
   @Schema({

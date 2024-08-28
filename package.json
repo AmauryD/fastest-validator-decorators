@@ -41,18 +41,18 @@
   ],
   "types": "dist/index.d.ts",
   "devDependencies": {
-    "@swc/core": "^1.4.0",
-    "@types/node": "^20.11.17",
+    "@swc/core": "^1.7.19",
+    "@types/node": "^22.5.1",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "@vitest/coverage-v8": "^1.2.2",
-    "eslint": "^8.56.0",
-    "fastest-validator": "~1.17.0",
-    "reflect-metadata": "^0.2.1",
+    "@vitest/coverage-v8": "^2.0.5",
+    "eslint": "^8.0.0",
+    "fastest-validator": "~1.19.0",
+    "reflect-metadata": "^0.2.2",
     "ts-node": "^10.9.2",
-    "tsup": "^8.0.2",
-    "typescript": "^5.3.3",
-    "vitest": "^1.2.2"
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
   },
   "peerDependencies": {
     "fastest-validator": "^1.15.0",
@@ -60,9 +60,9 @@
   },
   "type": "module",
   "dependencies": {
-    "type-fest": "~4.10.2"
+    "type-fest": "~4.25.0"
   },
   "volta": {
-    "node": "16.19.0"
+    "node": "18.20.4"
   }
 }
