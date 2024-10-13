@@ -1,34 +1,53 @@
-[![npm](https://img.shields.io/npm/v/fastest-validator-decorators.svg)](https://www.npmjs.com/package/fastest-validator-decorators) 
-[![npm](https://img.shields.io/npm/dm/fastest-validator-decorators.svg)](https://www.npmjs.com/package/fastest-validator-decorators) 
-[![GitHub issues](https://img.shields.io/github/issues/tobydeh/fastest-validator-decorators.svg)](https://github.com/tobydeh/fastest-validator-decorators/issues) 
-[![GitHub license](https://img.shields.io/github/license/tobydeh/fastest-validator-decorators.svg)](https://github.com/tobydeh/fastest-validator-decorators/blob/master/LICENSE)
+[![npm version](https://img.shields.io/npm/v/fastest-validator-decorators.svg)](https://www.npmjs.com/package/fastest-validator-decorators)
+[![npm downloads](https://img.shields.io/npm/dm/fastest-validator-decorators.svg)](https://www.npmjs.com/package/fastest-validator-decorators)
+[![GitHub issues](https://img.shields.io/github/issues/tobydeh/fastest-validator-decorators.svg)](https://github.com/tobydeh/fastest-validator-decorators/issues)
+[![License](https://img.shields.io/github/license/tobydeh/fastest-validator-decorators.svg)](https://github.com/tobydeh/fastest-validator-decorators/blob/master/LICENSE)
 
 # Fastest Validator Decorators
-> Decorators for [fastest-validator](https://github.com/icebob/fastest-validator#readme)
 
-:boom: Coming from 1.x ? See the [Migration Guide](MIGRATING.md).
+**Fastest Validator Decorators** is a TypeScript library providing a set of decorators that streamline the integration with the [fastest-validator](https://github.com/icebob/fastest-validator#readme), a high-performance validation library for JavaScript and TypeScript. This package simplifies schema definition and validation by leveraging TypeScript's decorator feature.
 
-## Example usage
+:boom: Upgrading from version 1.x? Check the [Migration Guide](MIGRATING.md).
 
-```js
+## Key Features
+- **Type-safe schema validation** using TypeScript decorators.
+- Supports all validation types provided by fastest-validator.
+- **Nested object and array validation** made simple with decorators.
+- **Async validation support**, enabling you to run asynchronous validation tasks.
+  
+## Installation
+
+Install the package via npm:
+
+```bash
+npm install --save fastest-validator-decorators fastest-validator
+```
+
+:warning: **Note:** `fastest-validator` is a peer dependency, so ensure it's also installed.
+
+Next, enable decorators in your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
+```
+
+## Usage Example
+
+Here’s a basic example of how to use the decorators in your project:
+
+```ts
 import {
-  Schema,
-  Array,
-  Nested,
-  UUID,
-  Enum,
-  Email,
-  Number,
-  getSchema,
-  validate,
-  validateOrReject
+  Schema, Array, UUID, Enum, Email, Number, Nested, getSchema, validate, validateOrReject
 } from "fastest-validator-decorators";
 
-@Schema({
-  strict: true
-})
+@Schema({ strict: true })
 class Entity1 {
-  @Array({ items: "string"})
+  @Array({ items: "string" })
   prop1: string[];
 }
 
@@ -37,11 +56,11 @@ class Entity2 {
   @UUID()
   prop1: string;
 
-  @Enum({ values : ["one", "two"] })
+  @Enum({ values: ["one", "two"] })
   prop2: "one" | "two";
 
   @Email()
-  prop3;
+  prop3: string;
 
   @Number({ positive: true })
   prop4: number;
@@ -50,89 +69,33 @@ class Entity2 {
   prop5: Entity1;
 }
 
-const schema = getSchema(Entity2); // get the fastest-validator schema
-{
-  $$strict: false,
-  prop1: { type: "uuid" },
-  prop2: { type: "enum", values: ["one", "two"] },
-  prop3: { type: "email" },
-  prop4: { type: "number", positive: true },
-  prop5: { type: "object", strict: true, props: {
-    prop1: { type: "array", items: "string" }
-  }}
-}
+// Generating a validation schema
+const schema = getSchema(Entity2);
 
+// Creating and validating instances
 const entity = new Entity2();
-entity.prop1 = "thiswillfail";
+entity.prop1 = "invalid-uuid";  // Validation error: invalid UUID
 entity.prop2 = "one";
-entity.prop3 = "some@email.com";
-entity.prop4 = -10;
-entity.prop5 = new Entity1();
+entity.prop3 = "user@example.com";
+entity.prop4 = -10;  // Validation error: number is not positive
 
-const result = validate(entity); // returns true or fastest-validator errors
-const result = await validateOrReject(entity); // returns true or throws fastest-validator errors
+const result = validate(entity); // true or error list
+await validateOrReject(entity);   // true or throws an error
 ```
 
-## Setup
+## Available Decorators
 
-Install the package
-```
-npm install --save fastest-validator-decorators fastest-validator
-```
+Fastest Validator Decorators supports the following decorators for schema definition. Each decorator corresponds to a validation type from [fastest-validator](https://github.com/icebob/fastest-validator#readme).
 
-:sparkles: fastest-validator is a peerDependency.
+- **@Schema**: Defines the validation schema for a class.
+- **@Field**: Generic decorator for defining custom fields.
+- **@String**, **@Boolean**, **@Number**, **@UUID**, **@ObjectId**, **@Email**, **@Date**, **@Enum**, **@Array**, **@Equal**, **@Instance**, **@Currency**, **@Func**, **@Luhn**, **@Mac**, **@Url**, **@Any**, **@Multi**: Each of these applies a specific fastest-validator type with custom options.
+  
+You can also use **@Nested** and **@NestedArray** for validating complex objects and arrays of objects.
 
-Add the following to your tsconfig.json
-```
-"experimentalDecorators": true
-"emitDecoratorMetadata": true
-```
+### Decorator Stacking
 
-## Available decorators
-
-All decorators accept an object of options that apply to the type being used, for a full list of options please refer to the fastest-validator [documentation](https://www.npmjs.com/package/fastest-validator).
-
-**@Schema({ strict = false, async = false }, messages={})** - Schema decorator. 
-
-**@Field({})** - Generic decorator, no default properties set. Will apply all options to the schema.
-
-[**@String({})**](https://github.com/icebob/fastest-validator#string) - Applies { type: "string" }
-
-[**@Boolean({})**](https://github.com/icebob/fastest-validator#boolean) - Applies { type: "boolean" }
-
-[**@Number({})**](https://github.com/icebob/fastest-validator#number) - Applies { type: "number" }
-
-[**@UUID({})**](https://github.com/icebob/fastest-validator#uuid) - Applies { type: "uuid" }
-
-[**@ObjectId({})**](https://github.com/icebob/fastest-validator#objectid) - Applies { type: "objectid" }
-
-[**@Email({})**](https://github.com/icebob/fastest-validator#email) - Applies { type: "email" }
-
-[**@Date({})**](https://github.com/icebob/fastest-validator#date) - Applies { type: "date" }
-
-[**@Enum({})**](https://github.com/icebob/fastest-validator#enum) - Applies { type: "enum" }
-
-[**@Array({})**](https://github.com/icebob/fastest-validator#array) - Applies { type: "array" }
-
-[**@Equal({})**](https://github.com/icebob/fastest-validator#equal) - Applies { type: "equal" }
-
-[**@Instance({})**](https://github.com/icebob/fastest-validator#class) - Applies { type: "class" }
-
-[**@Currency({})**](https://github.com/icebob/fastest-validator#currency) - Applies { type: "currency" }
-
-[**@Func({})**](https://github.com/icebob/fastest-validator#function) - Applies { type: "function" }
-
-[**@Luhn({})**](https://github.com/icebob/fastest-validator#luhn) - Applies { type: "luhn" }
-
-[**@Mac({})**](https://github.com/icebob/fastest-validator#mac) - Applies { type: "mac" }
-
-[**@Url({})**](https://github.com/icebob/fastest-validator#url) - Applies { type: "url" }
-
-[**@Any({})**](https://github.com/icebob/fastest-validator#any) - Applies { type: "any" }
-
-[**@Multi({})**](https://github.com/icebob/fastest-validator#multi) - Applies { type: "multi" }
-
-Also resolves to multi if multiple decorators are stacked on a single field.
+The library allows stacking multiple decorators on a single property. For example:
 
 ```ts
 @String()
@@ -140,61 +103,36 @@ Also resolves to multi if multiple decorators are stacked on a single field.
 prop1: string | number;
 ```
 
-**@Nested({})** - Applies { type: "object", props: {} } (The props are gathered from the nested schema)
+This syntax resolves to the @Multi decorator, which validates the property against multiple types.
 
-**@NestedArray({ validator: `<ValidatorSchema>` })** - Applies { type: "array", "items": { type :"object",  props: { ... } }} (The props are gathered from the nested schema)
+### Async Validation Support
 
-[**@Custom({})**](https://github.com/icebob/fastest-validator#custom-validator) - Applies { type: "custom" }
-
-```ts
-@Custom({
-  check (value: number, errors: {type: string, actual: number}[]){
-    if (value % 2 !== 0) {
-      errors.push({ type: "even", actual : value });
-    }
-    return value;
-  }
-})
-```
-
-## Async support
-
-In order to a schema to be async , you must add the `async: true` to [SchemaOptions](https://github.com/AmauryD/fastest-validator-decorators/blob/6e34ebf41eae5ed60bb1f8bf0dc4379e72136f4e/src/schema.ts#L7).
-
-:warning: Be carefull, when enabling async option, the return of the validate function becomes a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+Async validation is supported by adding the `async: true` option to your schema. Here's an example of how to use asynchronous checks within a custom validation:
 
 ```ts
-@Schema({
-  async: true,
-  strict: true
-})
+@Schema({ async: true, strict: true })
 class User {
   @Custom({
-    async check (value: string, errors: {type: string, actual: string}[]) {
+    async check(value, errors) {
       const isUserInDB = await db.checkUserName(value);
-      if (isUserInDB) {
-        errors.push({ type: "unique", actual : value });
-      }
+      if (isUserInDB) errors.push({ type: "unique", actual: value });
       return value;
-    },
+    }
   })
-  username!: string;
+  username: string;
 }
 
 const user = new User();
-user.username = "James Bond";
-const result = await validate(user);
+user.username = "existingUser";
+await validateOrReject(user);  // async validation
 ```
 
-## Available methods
+## API Methods
 
-**getSchema()** - Returns the fastest-validator schema for a given class
-
-**validate()** - Returns true or fastest-validator errors for a given instance
-
-**validateOrReject()** - Returns true or throws fastest-validator errors for a given instance
-
+- **getSchema(Class)**: Retrieves the fastest-validator schema for a given class.
+- **validate(instance)**: Validates the provided instance and returns `true` or an error list.
+- **validateOrReject(instance)**: Same as `validate()`, but throws errors if validation fails.
 
 ## License
-Licensed under the MIT license.
 
+This project is licensed under the [MIT License](LICENSE).
