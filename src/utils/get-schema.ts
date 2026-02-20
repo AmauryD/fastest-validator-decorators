@@ -6,6 +6,6 @@ import { getPrototypeChain } from "./get-prototype-chain.js";
 export function getSchema (klass: Class<any>): ValidationSchema {
   const chain = getPrototypeChain(klass.prototype);
   const schema = {};
-  Object.assign(schema, ...chain.map(c => Reflect.getOwnMetadata(SCHEMA_KEY, c)));
+  Object.assign(schema, ...chain.reverse().map(c => Reflect.getOwnMetadata(SCHEMA_KEY, c)));
   return schema;
 }
