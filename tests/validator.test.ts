@@ -757,6 +757,69 @@ describe("Extending schemas", () => {
     });
   });
 
+  test("Child can override parent field decorators", () => {
+    @Schema()
+    class Parent {
+      @String({ min: 5 })
+        name!: string;
+
+      @Number()
+        age!: number;
+    }
+
+    @Schema()
+    class Child extends Parent {
+      @String({ min: 1 })
+        name!: string;
+    }
+
+    expect(getSchema(Parent)).toEqual({
+      $$strict: false,
+      name: { type: "string", min: 5 },
+      age: { type: "number" },
+    });
+
+    expect(getSchema(Child)).toEqual({
+      $$strict: false,
+      name: { type: "string", min: 1 },
+      age: { type: "number" },
+    });
+
+    const child = new Child();
+    child.name = "ab";
+    child.age = 1;
+    expect(validate(child)).toEqual(true);
+
+    const parent = new Parent();
+    parent.name = "ab";
+    parent.age = 1;
+    expect((validate(parent) as ValidationError[])[0].type).toEqual("stringMin");
+  });
+
+  test("Grandchild can override through multiple levels", () => {
+    @Schema()
+    class A {
+      @String({ min: 10 })
+        field!: string;
+    }
+
+    @Schema()
+    class B extends A {
+      @String({ min: 5 })
+        field!: string;
+    }
+
+    @Schema()
+    class C extends B {
+      @String({ min: 1 })
+        field!: string;
+    }
+
+    expect(getSchema(A)).toEqual({ $$strict: false, field: { type: "string", min: 10 } });
+    expect(getSchema(B)).toEqual({ $$strict: false, field: { type: "string", min: 5 } });
+    expect(getSchema(C)).toEqual({ $$strict: false, field: { type: "string", min: 1 } });
+  });
+
   test("Validation is required for inherited properties", () => {
     @Schema()
     class Parent {
