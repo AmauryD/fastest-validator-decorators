@@ -13,20 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ 16, 18, 20 ]
+        node: [ 20, 22, 24 ]
     name: Node ${{ matrix.node }} tests
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/checkout@v4
+      - uses: wyvox/action-setup-pnpm@v3
         with:
           node-version: ${{ matrix.node }}
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: true
       - name: Run tests
         run: pnpm test
