@@ -41,6 +41,9 @@ function getNestedObject (schemaClass: Class<any>, options: Record<string, unkno
   delete props.$$strict;
   // never $$async in nested
   delete props.$$async;
+  if (Object.keys(props).length === 0) {
+    throw new Error(`@Nested target ${schemaClass.name || "<anonymous>"} has no schema metadata. Apply @Schema and property decorators, or pass a different validator.`);
+  }
   return  { ...options, props, strict, type: "object" };
 }
 
@@ -54,10 +57,11 @@ export function Nested (options: NestedOptions = {}): any {
   return (target: Class<any>, key: string): any => {
     const t = options.validator ?? Reflect.getMetadata("design:type", target, key);
     if (!t) {
-      throw new Error(`Cannot get \"design:type\" of ${key}. Please use the validator option to @Nested`); 
+      throw new Error(`Cannot get \"design:type\" of ${key}. Please use the validator option to @Nested`);
     }
-    delete (options as Partial<NestedArrayOptions>).validator;
-    updateSchema(target, key, getNestedObject(t, options));
+    const rest = { ...options };
+    delete rest.validator;
+    updateSchema(target, key, getNestedObject(t, rest));
   };
 }
 
@@ -65,9 +69,8 @@ type NestedArrayOptions = Except<Partial<RuleArray>, "items"> & { validator: Cla
 
 export function NestedArray (options: NestedArrayOptions): any {
   return (target: Class<any>, key: string): any => {
-    const validator = options.validator;
-    // force Typescript to be happy
-    delete (options as Partial<NestedArrayOptions>).validator;
-    updateSchema(target, key, wrapIntoArray(getNestedObject(validator, {}), options));
+    const rest: Partial<NestedArrayOptions> = { ...options };
+    delete rest.validator;
+    updateSchema(target, key, wrapIntoArray(getNestedObject(options.validator, {}), rest));
   };
 }

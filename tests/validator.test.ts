@@ -551,6 +551,34 @@ describe("Nested", () => {
     });
   });
 
+  it("Should not mutate the options argument", () => {
+    @Schema()
+    class NestedTest {
+      @Boolean()
+        prop!: boolean;
+    }
+    const sharedOptions = { validator: NestedTest, optional: true };
+    @Schema()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    class Test {
+      @Nested(sharedOptions)
+        prop!: NestedTest;
+    }
+    expect(sharedOptions.validator).toBe(NestedTest);
+  });
+
+  it("Should throw when the target class has no schema metadata", () => {
+    class Plain { }
+    expect(() => {
+      @Schema()
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      class Test {
+        @Nested({ validator: Plain })
+          prop!: Plain;
+      }
+    }).toThrow(/no schema/);
+  });
+
   it("Should not remove nested $$strict", () => {
     @Schema()
     class NestedTest {
@@ -1089,5 +1117,21 @@ describe("Nested Array", () => {
       "$$strict": false
     });
     expect(validationResult).toStrictEqual(true);
+  });
+
+  it("Should not mutate the options argument", () => {
+    @Schema()
+    class TestNested {
+      @String()
+      public declare name: string;
+    }
+    const sharedOptions = { validator: TestNested, optional: true };
+    @Schema()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    class Test {
+      @NestedArray(sharedOptions)
+        prop!: TestNested[];
+    }
+    expect(sharedOptions.validator).toBe(TestNested);
   });
 });
