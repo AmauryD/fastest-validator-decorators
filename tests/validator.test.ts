@@ -820,6 +820,36 @@ describe("Extending schemas", () => {
     expect(getSchema(C)).toEqual({ $$strict: false, field: { type: "string", min: 1 } });
   });
 
+  test("Child @Schema() without strict inherits parent's strict setting", () => {
+    @Schema({ strict: true })
+    class Parent {
+      @String()
+        a!: string;
+    }
+
+    @Schema()
+    class Child extends Parent {
+      @String()
+        b!: string;
+    }
+
+    expect(getSchema(Parent)).toEqual({
+      $$strict: true,
+      a: { type: "string" },
+    });
+
+    expect(getSchema(Child)).toEqual({
+      $$strict: true,
+      a: { type: "string" },
+      b: { type: "string" },
+    });
+
+    const child = new Child();
+    Object.assign(child, { a: "a", b: "b", extra: "x" });
+    const result = validate(child);
+    expect((result as ValidationError[])[0].type).toEqual("objectStrict");
+  });
+
   test("Validation is required for inherited properties", () => {
     @Schema()
     class Parent {

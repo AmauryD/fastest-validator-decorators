@@ -5,7 +5,10 @@ import { getPrototypeChain } from "./get-prototype-chain.js";
 
 export function getSchema (klass: Class<any>): ValidationSchema {
   const chain = getPrototypeChain(klass.prototype);
-  const schema = {};
+  const schema: ValidationSchema = {};
   Object.assign(schema, ...chain.reverse().map(c => Reflect.getOwnMetadata(SCHEMA_KEY, c)));
+  if (!("$$strict" in schema)) {
+    schema.$$strict = false;
+  }
   return schema;
 }

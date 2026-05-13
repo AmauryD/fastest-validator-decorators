@@ -13,7 +13,9 @@ export type SchemaOptions<T> = {
 
 export function Schema<T> (schemaOptions?: SchemaOptions<T>, validatorOptions : ValidatorConstructorOptions = {}): any {
   return function _Schema<T extends Constructor<any>> (target: T): T {
-    updateSchema(target.prototype, "$$strict", schemaOptions?.strict ?? false);
+    if (schemaOptions?.strict !== undefined) {
+      updateSchema(target.prototype, "$$strict", schemaOptions.strict);
+    }
     if (schemaOptions?.async !== undefined) {
       updateSchema(target.prototype, "$$async", schemaOptions.async);
     }
