@@ -1,4 +1,5 @@
 import type { RuleCustom, RuleString, RuleBoolean, RuleNumber, RuleUUID, RuleObjectID, RuleEmail, RuleDate, RuleEnum, RuleArray, RuleAny, RuleEqual, RuleClass, RuleCurrency, RuleFunction, RuleLuhn, RuleMac, RuleURL, RuleCustomInline, RuleMulti } from "fastest-validator";
+import { SCHEMA_KEY } from "./constants.js";
 import { getSchema } from "./utils/get-schema.js";
 import { updateSchema } from "./utils/update-schema.js";
 import type { Class, Except , HasRequiredKeys , OmitIndexSignature } from "type-fest";
@@ -34,6 +35,15 @@ export const Luhn = decoratorFactory<RemoveTypeFromRule<RuleLuhn>>({ type: "luhn
 export const Mac = decoratorFactory<RemoveTypeFromRule<RuleMac>>({ type: "mac" });
 export const Url = decoratorFactory<RemoveTypeFromRule<RuleURL>>({ type: "url" });
 export const Custom = decoratorFactory<RemoveTypeFromRule<RuleCustomInline>>({ type: "custom" });
+
+export function Optional(): any {
+  return (target: Class<any>, key: string | symbol): any => {
+    const schema = Reflect.getOwnMetadata(SCHEMA_KEY, target) ?? {};
+    const existing = schema[key] ?? {};
+    schema[key] = { ...existing, optional: true };
+    Reflect.defineMetadata(SCHEMA_KEY, schema, target);
+  };
+}
 
 function getNestedObject (schemaClass: Class<any>, options: Record<string, unknown>): Record<string, unknown> {
   const props = Object.assign({}, getSchema(schemaClass));
